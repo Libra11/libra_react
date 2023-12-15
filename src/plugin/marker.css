@@ -1,0 +1,22 @@
+.modal {
+  width: 400px;
+  height: 300px;
+  position: fixed; /* 使用固定定位 */
+  top: 50%; /* 从顶部开始的位置为50% */
+  left: 50%; /* 从左边开始的位置为50% */
+  transform: translate(
+    -50%,
+    -50%
+  ); /* 使用transform属性将弹窗移动到视口的中心 */
+  z-index: 9999; /* 使用z-index确保弹窗在其他元素之上 */
+  /* 其他样式，如背景色、边框等 */
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+}
+
+.cdx-marker {
+  position: relative;
+  background-color: #ff9900;
+}

@@ -4,12 +4,12 @@
  * @LastEditors: Libra
  * @Description:
  */
-const dev_url: string = "https://localhost:8881/blog/api/v1/";
+const dev_url: string = "http://localhost:9090/";
 const dev_service = {
   EXAM: `${dev_url}`,
 };
 
-const exam_prod_url: string = "https://localhost:8881/blog/api/v1/";
+const exam_prod_url: string = "http://localhost:9090/";
 const prod_server = {
   EXAM: `${exam_prod_url}`,
 };

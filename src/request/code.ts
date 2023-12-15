@@ -1,7 +1,7 @@
 /*
  * @Author: Libra
  * @Date: 2023-03-22 15:47:47
- * @LastEditTime: 2023-12-05 17:57:26
+ * @LastEditTime: 2023-12-07 18:12:13
  * @LastEditors: Libra
  * @Description: 返回码处理
  */
@@ -14,14 +14,13 @@ const code = {
 };
 
 export function handleCode(res: ResponseData<string>) {
-  const [messageApi] = message.useMessage();
   switch (res.code) {
     case code.LOGIN_FAIL:
       // 登录失败
-      messageApi.error("登录失败");
+      message.error("登录失败");
       break;
     default:
-      messageApi.error(res.message);
+      message.error(res.message);
       break;
   }
 }

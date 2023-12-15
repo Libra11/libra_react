@@ -1,7 +1,7 @@
 /*
  * @Author: Libra
  * @Date: 2023-03-22 10:31:03
- * @LastEditTime: 2023-12-05 17:53:29
+ * @LastEditTime: 2023-12-15 14:33:16
  * @LastEditors: Libra
  * @Description: fetch 封装
  */
@@ -22,7 +22,7 @@ export interface RequestOptions extends Partial<RequestInit> {
 export function getOptions(options?: RequestOptions): RequestInit {
   const { token } = store.getState().user;
   const headers: Record<string, string> = {
-    Authorization: token ? `Bearer ${token}` : "",
+    Authorization: token ? token : "",
   };
   if (options?.formData) {
     options.body = options.formData;
@@ -39,7 +39,7 @@ export function getOptions(options?: RequestOptions): RequestInit {
 
 export default async <T>(
   url: string,
-  option?: RequestInit,
+  option?: RequestOptions,
   service: string = config.EXAM
 ): Promise<ResponseData<T>> => {
   const newOption = getOptions(option);
@@ -47,7 +47,7 @@ export default async <T>(
   try {
     const response = await fetch(newUrl, newOption);
     const res = await response.json();
-    if (res.code) handleCode(res);
+    if (res.code && res.code !== 200) handleCode(res);
     return res;
   } catch (error) {
     return Promise.reject(error);

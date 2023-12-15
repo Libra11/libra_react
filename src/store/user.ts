@@ -4,15 +4,18 @@
  * @LastEditors: Libra
  * @Description:
  */
+import { IUser } from "@/api/user";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserState {
   token: string;
+  userInfo: Partial<IUser>;
 }
 
 const initialState: UserState = {
   token: "",
+  userInfo: {},
 };
 
 export const userSlice = createSlice({
@@ -22,9 +25,12 @@ export const userSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload;
     },
+    setUserInfo: (state, action: PayloadAction<Partial<IUser>>) => {
+      state.userInfo = action.payload;
+    },
   },
 });
 
-export const { setToken } = userSlice.actions;
+export const { setToken, setUserInfo } = userSlice.actions;
 
 export default userSlice.reducer;
