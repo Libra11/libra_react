@@ -9,15 +9,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { Button, message, Upload } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
-
-interface OSSDataType {
-  dir: string;
-  expire: string;
-  host: string;
-  accessId: string;
-  policy: string;
-  signature: string;
-}
+import { IToken, getOssTokenApi } from "@/api/blog";
 
 interface AliyunOSSUploadProps {
   value?: UploadFile[];
@@ -25,23 +17,15 @@ interface AliyunOSSUploadProps {
 }
 
 export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
-  const [OSSData, setOSSData] = useState<OSSDataType>();
-
-  // Mock get OSS api
-  // https://help.aliyun.com/document_detail/31988.html
-  const mockGetOSSData = () => ({
-    dir: "user-dir/",
-    expire: "1577811661",
-    host: "//www.mocky.io/v2/5cc8019d300000980a055e76",
-    accessId: "c2hhb2RhaG9uZw==",
-    policy: "eGl4aWhhaGFrdWt1ZGFkYQ==",
-    signature: "ZGFob25nc2hhbw==",
-  });
+  const [OSSData, setOSSData] = useState<IToken>();
 
   const init = useCallback(async () => {
     try {
-      const result = await mockGetOSSData();
-      setOSSData(result);
+      const result = await getOssTokenApi();
+      if (result.code === 200) {
+        const res = result.data;
+        setOSSData(res);
+      }
     } catch (error: any) {
       message.error(error);
     }
@@ -69,9 +53,11 @@ export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
     OSSAccessKeyId: OSSData?.accessId,
     policy: OSSData?.policy,
     Signature: OSSData?.signature,
+    "x-oss-security-token": OSSData?.securityToken,
   });
 
   const beforeUpload: UploadProps["beforeUpload"] = async (file) => {
+    console.log(OSSData);
     if (!OSSData) return false;
 
     const expire = Number(OSSData.expire) * 1000;
