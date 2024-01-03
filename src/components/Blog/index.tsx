@@ -1,9 +1,10 @@
 /**
  * Author: Libra
- * Date: 2023-12-11 10:59:04
+ * Date: 2023-12-28 17:59:21
  * LastEditors: Libra
  * Description:
  */
+import "./index.css";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import LinkTool from "@editorjs/link";
@@ -22,95 +23,182 @@ import {
   SelectProps,
   Space,
 } from "antd";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AliyunOSSUpload } from "@/components/AliyunOSSUpload";
 import {
+  IBlog,
+  addBlogApi,
   addCategoryApi,
   addTagApi,
   getAllCategoryApi,
   getAllTagsApi,
+  getBlogByIdApi,
 } from "@/api/blog";
 import { PlusOutlined } from "@ant-design/icons";
+import { upload } from "@/utils";
+import { config } from "@/api/config";
 
-export const BlogView: React.FC = () => {
+interface BlogComProps {
+  id?: number;
+}
+
+export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   const [editor, setEditor] = useState<EditorJS>();
   const [form] = Form.useForm();
-  const initEditor = useCallback(
-    (holder: string, readOnly = false, data?: OutputData) => {
-      const editorConfig = {
-        placeholder: "Let`s write an awesome story!",
-        autofocus: true,
-        defaultBlock: "paragraph",
-        tools: {
-          header: Header,
-          link: LinkTool,
-          code: editorjsCodeflask,
-          list: List,
-          table: {
-            class: Table,
-            inlineToolbar: true,
-          },
-          MarkerTool,
-          image: {
-            class: ImageTool,
-            config: {
-              endpoints: {
-                byFile: "http://localhost:8008/uploadFile", // Your backend file uploader endpoint
-                byUrl: "http://localhost:8008/fetchUrl", // Your endpoint that provides uploading by Url
+  const initEditor = (holder: string, data?: OutputData) => {
+    const editorConfig = {
+      placeholder: "Let`s write an awesome story!",
+      autofocus: true,
+      readOnly: false,
+      defaultBlock: "paragraph",
+      tools: {
+        header: Header,
+        link: LinkTool,
+        code: editorjsCodeflask,
+        list: List,
+        table: {
+          class: Table,
+          inlineToolbar: true,
+        },
+        MarkerTool,
+        image: {
+          class: ImageTool,
+          config: {
+            caption: false,
+            uploader: {
+              async uploadByFile(file: File) {
+                try {
+                  const res = await upload(file);
+                  form.setFieldValue("imgUrl", res);
+                  return {
+                    success: 1,
+                    file: {
+                      url: res,
+                    },
+                  };
+                } catch (err) {
+                  console.log(err);
+                }
+              },
+              async uploadByUrl(url: string) {
+                try {
+                  const response = await fetch(url);
+                  const blob = await response.blob();
+                  const file = new File([blob], "downloaded_image.jpg", {
+                    type: blob.type,
+                  });
+                  const res = await upload(file);
+                  return {
+                    success: 1,
+                    file: {
+                      url: res,
+                    },
+                  };
+                } catch (err) {
+                  console.log(err);
+                }
               },
             },
           },
         },
+      },
+    };
+    const config: any = {
+      ...editorConfig,
+      holder,
+    };
+    if (data) {
+      config.data = data;
+    }
+    const e: EditorJS = new EditorJS(config);
+    e.isReady.then(() => {
+      console.log("Editor.js is ready to work!");
+    });
+    return e;
+  };
+  const initBlogField = async (id: number) => {
+    const res = await getBlogByIdApi(id);
+    if (res.code === 200) {
+      const blog = res.data.blog;
+      const content = JSON.parse(blog.content);
+      const formData = {
+        title: blog.title,
+        desc: blog.desc,
+        imgUrl: blog.imgUrl,
+        category: (blog.category || []).map((item: any) => ({
+          label: item.name,
+          value: String(item.id),
+        })),
+        tags: (blog.tags || []).map((item: any) => ({
+          label: item.name,
+          value: String(item.id),
+        })),
       };
-      const config: any = {
-        ...editorConfig,
-        holder,
-        readOnly,
-      };
-      if (data) {
-        config.data = data;
+      form.setFieldsValue(formData);
+      if (!editor) {
+        const e = initEditor("editorjs", content);
+        setEditor(e);
+      } else {
+        editor.render(content);
       }
-      const e: EditorJS = new EditorJS(config);
-      e.isReady.then(() => {
-        console.log("Editor.js is ready to work!");
-      });
-      return e;
-    },
-    []
-  );
-  const saveBlog = () => {
+    }
+  };
+  const save = () => {
     if (!editor) return;
     editor
       .save()
-      .then((outputData) => {
-        const e = initEditor("editorjs2", false, outputData);
-        e.isReady.then(() => {
-          e.readOnly.toggle();
-          initListener();
-        });
+      .then(async (outputData) => {
+        const formData = form.getFieldsValue();
         console.log("Article data: ", outputData);
+        const formDataFormat = {
+          ...formData,
+          createAt: new Date().getTime(),
+          updateAt: new Date().getTime(),
+          audioFile: "",
+          author: "Libra",
+          category: formData.category.map((item: any) => {
+            return {
+              id: Number(item.value),
+              name: item.label,
+            };
+          }),
+          tags: formData.tags.map((item: any) => {
+            return {
+              id: Number(item.value),
+              name: item.label,
+            };
+          }),
+        };
+        const blog: IBlog = {
+          blog: {
+            ...formDataFormat,
+            content: JSON.stringify(outputData),
+          },
+        };
+        if (id) {
+          blog.blog.id = id;
+        }
+        await saveBlog(blog);
       })
       .catch((error) => {
         console.log("Saving failed: ", error);
       });
   };
 
-  const initListener = () => {
-    setTimeout(() => {
-      const markers = document.querySelectorAll("#editorjs2 .cdx-marker");
-      console.log("markers", markers);
-      markers.forEach((marker) => {
-        marker.addEventListener("click", () => {
-          const data = (marker as HTMLElement).dataset;
-          console.log("data", data.example, data.pronunciation, data.word);
-        });
-      });
-    }, 100);
+  const saveBlog = async (blog: IBlog) => {
+    const res = await addBlogApi(blog);
+    if (res.code === 200) {
+      console.log("保存成功");
+    }
   };
 
   const onFinish = (values: any) => {
-    saveBlog();
+    save();
     console.log("Received values of form: ", values);
+  };
+
+  const onFinishFailed = (errorInfo: any) => {
+    console.log("Failed:", errorInfo);
   };
 
   const [tagOptions, setTagOptions] = useState<SelectProps["options"]>([]);
@@ -126,7 +214,7 @@ export const BlogView: React.FC = () => {
     console.log(`selected ${value}`);
   };
 
-  const handleTagFocus = async () => {
+  const getTags = async () => {
     const res = await getAllTagsApi();
     if (res.code === 200) {
       const tags = res.data.tags.map((item) => ({
@@ -137,7 +225,7 @@ export const BlogView: React.FC = () => {
     }
   };
 
-  const handleCategoryFocus = async () => {
+  const getCategory = async () => {
     const res = await getAllCategoryApi();
     if (res.code === 200) {
       const category = res.data.category.map((item) => ({
@@ -205,9 +293,15 @@ export const BlogView: React.FC = () => {
   };
 
   useEffect(() => {
-    const e = initEditor("editorjs", false, undefined);
-    setEditor(e);
-  }, [initEditor]);
+    getTags();
+    getCategory();
+    if (id) {
+      initBlogField(id);
+    } else {
+      const e = initEditor("editorjs", undefined);
+      setEditor(e);
+    }
+  }, [id]);
 
   return (
     <>
@@ -215,6 +309,7 @@ export const BlogView: React.FC = () => {
         form={form}
         name="register"
         onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
         style={{ maxWidth: 600 }}
         scrollToFirstError
       >
@@ -240,20 +335,12 @@ export const BlogView: React.FC = () => {
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          name="category"
-          label="分类"
-          rules={[
-            {
-              message: "请输入分类!",
-            },
-          ]}
-        >
+        <Form.Item name="category" label="分类">
           <Select
+            labelInValue
             mode="tags"
             style={{ width: "100%" }}
             placeholder="分类"
-            onFocus={handleCategoryFocus}
             onChange={handleCategoryChange}
             options={categoryOptions}
             dropdownRender={(menu) => (
@@ -280,20 +367,12 @@ export const BlogView: React.FC = () => {
             )}
           />
         </Form.Item>
-        <Form.Item
-          name="tag"
-          label="标签"
-          rules={[
-            {
-              message: "请输入标签!",
-            },
-          ]}
-        >
+        <Form.Item name="tags" label="标签">
           <Select
+            labelInValue
             mode="tags"
             style={{ width: "100%" }}
             placeholder="标签"
-            onFocus={handleTagFocus}
             onChange={handleTagChange}
             options={tagOptions}
             dropdownRender={(menu) => (
@@ -316,17 +395,22 @@ export const BlogView: React.FC = () => {
             )}
           />
         </Form.Item>
-        <Form.Item label="封面图" name="cover">
-          <AliyunOSSUpload />
+        <Form.Item label="封面图" name="imgUrl">
+          <AliyunOSSUpload title={id ? "更换" : "上传"} />
+        </Form.Item>
+        {id ? (
+          <img
+            src={`${config.FILE}${form.getFieldValue("imgUrl")}`}
+            alt="cover"
+          />
+        ) : null}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            保存
+          </Button>
         </Form.Item>
       </Form>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          注册
-        </Button>
-      </Form.Item>
       <div id="editorjs"></div>
-      <div id="editorjs2"></div>
     </>
   );
 };

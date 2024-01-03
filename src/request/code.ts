@@ -1,7 +1,7 @@
 /*
  * @Author: Libra
  * @Date: 2023-03-22 15:47:47
- * @LastEditTime: 2023-12-07 18:12:13
+ * @LastEditTime: 2023-12-28 14:15:05
  * @LastEditors: Libra
  * @Description: 返回码处理
  */
@@ -10,14 +10,13 @@ import { ResponseData } from ".";
 
 const code = {
   // 登录失败
-  LOGIN_FAIL: 1005,
+  NOT_LOGIN: 4009,
 };
 
 export function handleCode(res: ResponseData<string>) {
   switch (res.code) {
-    case code.LOGIN_FAIL:
-      // 登录失败
-      message.error("登录失败");
+    case code.NOT_LOGIN:
+      window.location.href = "/login";
       break;
     default:
       message.error(res.message);

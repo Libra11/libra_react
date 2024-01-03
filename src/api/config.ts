@@ -5,13 +5,16 @@
  * @Description:
  */
 const dev_url: string = "http://localhost:9090/";
+const file_url: string = "https://libra-blog.oss-cn-beijing.aliyuncs.com/";
 const dev_service = {
   EXAM: `${dev_url}`,
+  FILE: `${file_url}`,
 };
 
 const exam_prod_url: string = "http://localhost:9090/";
 const prod_server = {
   EXAM: `${exam_prod_url}`,
+  FILE: `${file_url}`,
 };
 
 let config: Record<string, string> = {};

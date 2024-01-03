@@ -82,9 +82,17 @@ export type IToken = {
 function getOssTokenApi(): Promise<ResponseData<IToken>> {
   return fetch<IToken>(`blog/getOssToken`);
 }
-
+export type ITags = {
+  id: number;
+  name: string;
+};
+export type ICategorys = {
+  id: number;
+  name: string;
+};
 export interface IBlog {
   blog: {
+    id?: number;
     title: string;
     author: string;
     content: string;
@@ -93,18 +101,57 @@ export interface IBlog {
     updateAt: number;
     imgUrl: string;
     desc: string;
-    category: {
-      id: number;
-      name: string;
-    }[];
-    tags: {
-      id: number;
-      name: string;
-    }[];
+    category: ICategorys[];
+    tags: ITags[];
   };
 }
 function addBlogApi(data: IBlog): Promise<ResponseData<string>> {
   return fetch<string>(`blog/addBlog`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export type GetBlogsRequest = {
+  page: number;
+  pageSize: number;
+  title: string;
+  categoryId: number;
+  tagId: number;
+};
+
+export type blogInfo = {
+  id: number;
+  title: string;
+  desc: string;
+  author: string;
+  tags: ITags[];
+  category: ICategorys[];
+  createAt: number;
+  updateAt: number;
+  imgUrl: string;
+};
+
+export type GetBlogsResponse = {
+  total: number;
+  blogs: blogInfo[];
+};
+
+function getBlogsApi(
+  data: GetBlogsRequest
+): Promise<ResponseData<GetBlogsResponse>> {
+  return fetch<GetBlogsResponse>(`blog/getBlogs`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+function getBlogByIdApi(id: number): Promise<ResponseData<IBlog>> {
+  return fetch<IBlog>(`blog/getBlogById?id=${id}`);
+}
+
+function deleteBlogApi(data: { id: number }): Promise<ResponseData<string>> {
+  return fetch<string>(`blog/deleteBlog`, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -119,4 +166,7 @@ export {
   addCategoryApi,
   addBlogApi,
   getOssTokenApi,
+  getBlogsApi,
+  getBlogByIdApi,
+  deleteBlogApi,
 };

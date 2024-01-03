@@ -14,10 +14,15 @@ import { LoginView } from "@/views/admin/login";
 import { AdminView } from "@/views/admin";
 import { AdminLayout } from "@/layout/admin";
 import { BlankLayout } from "@/layout/blank";
-import { BlogView } from "@/views/admin/blog";
+import { AddBlogView } from "@/views/admin/blog/add";
+import { BlogListView } from "@/views/admin/blog/list";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { BlogHomeView } from "@/views/blog/home";
+import { BlogRecentView } from "@/views/blog/list";
+import { BlogLayout } from "@/layout/blog";
+import { BlogDetailView } from "@/views/blog/detail";
 
 const routers = [
   {
@@ -34,7 +39,38 @@ const routers = [
       },
       {
         path: "blog",
-        element: <BlogView />,
+        children: [
+          {
+            path: "/admin/blog",
+            element: <Navigate to="/admin/blog/list" />,
+          },
+          {
+            path: "list",
+            element: <BlogListView />,
+          },
+          {
+            path: "add",
+            element: <AddBlogView />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/blog",
+    element: <BlogLayout />,
+    children: [
+      {
+        path: "recent",
+        element: <BlogRecentView />,
+      },
+      {
+        path: "home",
+        element: <BlogHomeView />,
+      },
+      {
+        path: "detail/:id",
+        element: <BlogDetailView />,
       },
     ],
   },

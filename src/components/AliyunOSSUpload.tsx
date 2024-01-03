@@ -12,11 +12,16 @@ import type { UploadFile } from "antd/es/upload/interface";
 import { IToken, getOssTokenApi } from "@/api/blog";
 
 interface AliyunOSSUploadProps {
-  value?: UploadFile[];
-  onChange?: (fileList: UploadFile[]) => void;
+  value?: string | undefined;
+  onChange?: (fileName: string | undefined) => void;
+  title: string;
 }
 
-export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
+export const AliyunOSSUpload = ({
+  value,
+  onChange,
+  title,
+}: AliyunOSSUploadProps) => {
   const [OSSData, setOSSData] = useState<IToken>();
 
   const init = useCallback(async () => {
@@ -35,13 +40,15 @@ export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
     init();
   }, [init]);
 
+  let fl: UploadFile<any>[] | undefined;
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    console.log("Aliyun OSS:", fileList);
-    onChange?.([...fileList]);
+    fl = fileList;
+    const files = fileList.map((file) => file.url);
+    onChange?.(files[0]);
   };
 
   const onRemove = (file: UploadFile) => {
-    const files = (value || []).filter((v) => v.url !== file.url);
+    const files = value === file.url ? undefined : value;
 
     if (onChange) {
       onChange(files);
@@ -66,8 +73,7 @@ export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
       await init();
     }
 
-    const suffix = file.name.slice(file.name.lastIndexOf("."));
-    const filename = Date.now() + suffix;
+    const filename = file.name;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     file.url = OSSData.dir + filename;
@@ -77,7 +83,7 @@ export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
 
   const uploadProps: UploadProps = {
     name: "file",
-    fileList: value,
+    fileList: fl,
     action: OSSData?.host,
     onChange: handleChange,
     onRemove,
@@ -86,8 +92,8 @@ export const AliyunOSSUpload = ({ value, onChange }: AliyunOSSUploadProps) => {
   };
 
   return (
-    <Upload {...uploadProps}>
-      <Button icon={<UploadOutlined />}>Click to Upload</Button>
+    <Upload listType="picture" {...uploadProps} maxCount={1}>
+      <Button icon={<UploadOutlined />}>{title}</Button>
     </Upload>
   );
 };
