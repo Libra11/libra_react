@@ -4,15 +4,6 @@
  * LastEditors: Libra
  * Description:
  */
-import "./index.css";
-import EditorJS, { OutputData } from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import LinkTool from "@editorjs/link";
-import editorjsCodeflask from "@calumk/editorjs-codeflask";
-import List from "@editorjs/list";
-import Table from "@editorjs/table";
-import MarkerTool from "@/plugin/marker";
-import ImageTool from "@editorjs/image";
 import {
   Button,
   Divider,
@@ -22,6 +13,11 @@ import {
   Select,
   SelectProps,
   Space,
+  Dropdown,
+  Modal,
+  Typography,
+  MenuProps,
+  message,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { AliyunOSSUpload } from "@/components/AliyunOSSUpload";
@@ -35,87 +31,93 @@ import {
   getBlogByIdApi,
 } from "@/api/blog";
 import { PlusOutlined } from "@ant-design/icons";
-import { upload } from "@/utils";
 import { config } from "@/api/config";
+import Markdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+import { CloseOutlined } from "@ant-design/icons";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import TextArea from "antd/es/input/TextArea";
+import { addWordApi } from "@/api/word";
 
 interface BlogComProps {
   id?: number;
 }
 
 export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
-  const [editor, setEditor] = useState<EditorJS>();
+  const [markdown, setMarkdown] = useState<string>("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const initEditor = (holder: string, data?: OutputData) => {
-    const editorConfig = {
-      placeholder: "Let`s write an awesome story!",
-      autofocus: true,
-      readOnly: false,
-      defaultBlock: "paragraph",
-      tools: {
-        header: Header,
-        link: LinkTool,
-        code: editorjsCodeflask,
-        list: List,
-        table: {
-          class: Table,
-          inlineToolbar: true,
-        },
-        MarkerTool,
-        image: {
-          class: ImageTool,
-          config: {
-            caption: false,
-            uploader: {
-              async uploadByFile(file: File) {
-                try {
-                  const res = await upload(file);
-                  form.setFieldValue("imgUrl", res);
-                  return {
-                    success: 1,
-                    file: {
-                      url: res,
-                    },
-                  };
-                } catch (err) {
-                  console.log(err);
-                }
-              },
-              async uploadByUrl(url: string) {
-                try {
-                  const response = await fetch(url);
-                  const blob = await response.blob();
-                  const file = new File([blob], "downloaded_image.jpg", {
-                    type: blob.type,
-                  });
-                  const res = await upload(file);
-                  return {
-                    success: 1,
-                    file: {
-                      url: res,
-                    },
-                  };
-                } catch (err) {
-                  console.log(err);
-                }
-              },
-            },
-          },
-        },
-      },
-    };
-    const config: any = {
-      ...editorConfig,
-      holder,
-    };
-    if (data) {
-      config.data = data;
-    }
-    const e: EditorJS = new EditorJS(config);
-    e.isReady.then(() => {
-      console.log("Editor.js is ready to work!");
-    });
-    return e;
+  const [formBlog] = Form.useForm();
+  const [messageApi] = message.useMessage();
+
+  const markdownChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMarkdown(e.target.value);
   };
+
+  const handleSave = () => {
+    saveWord()
+      .then((res: any) => {
+        const textarea: HTMLTextAreaElement = document.getElementById(
+          "libra_input"
+        ) as HTMLTextAreaElement;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectText = window.getSelection()?.toString();
+        const replaceText = `<span class="word" data-word="${res.id}">${selectText}</span>`;
+        setMarkdown(
+          markdown.substring(0, start) + replaceText + markdown.substring(end)
+        );
+        setIsModalVisible(false);
+      })
+      .catch((err) => {
+        messageApi.error(err.message);
+      });
+  };
+  const saveWord = () => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const formData = form.getFieldsValue();
+      const paramWord = {
+        word: {
+          word: formData.word,
+          definition: JSON.stringify(formData.definition),
+          phrase: JSON.stringify(formData.phrase),
+          example: JSON.stringify(formData.example),
+          createAt: new Date().getTime(),
+          updateAt: new Date().getTime(),
+        },
+      };
+      const res = await addWordApi(paramWord);
+      if (res.code === 200) {
+        messageApi.success("添加成功");
+        resolve(res.data);
+      } else {
+        reject(res);
+      }
+    });
+  };
+
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div className="flex items-center">
+          <div className="mr-2">添加单词</div>
+        </div>
+      ),
+      onClick: () => setIsModalVisible(true),
+    },
+    {
+      key: "2",
+      label: (
+        <div className="flex items-center">
+          <div className="mr-2">修改单词</div>
+        </div>
+      ),
+    },
+  ];
   const initBlogField = async (id: number) => {
     const res = await getBlogByIdApi(id);
     if (res.code === 200) {
@@ -134,55 +136,41 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           value: String(item.id),
         })),
       };
-      form.setFieldsValue(formData);
-      if (!editor) {
-        const e = initEditor("editorjs", content);
-        setEditor(e);
-      } else {
-        editor.render(content);
-      }
+      formBlog.setFieldsValue(formData);
+      setMarkdown(content);
     }
   };
-  const save = () => {
-    if (!editor) return;
-    editor
-      .save()
-      .then(async (outputData) => {
-        const formData = form.getFieldsValue();
-        console.log("Article data: ", outputData);
-        const formDataFormat = {
-          ...formData,
-          createAt: new Date().getTime(),
-          updateAt: new Date().getTime(),
-          audioFile: "",
-          author: "Libra",
-          category: formData.category.map((item: any) => {
-            return {
-              id: Number(item.value),
-              name: item.label,
-            };
-          }),
-          tags: formData.tags.map((item: any) => {
-            return {
-              id: Number(item.value),
-              name: item.label,
-            };
-          }),
+  const save = async () => {
+    const formData = formBlog.getFieldsValue();
+    const formDataFormat = {
+      ...formData,
+      createAt: new Date().getTime(),
+      updateAt: new Date().getTime(),
+      audioFile: "",
+      author: "Libra",
+      category: formData.category.map((item: any) => {
+        return {
+          id: Number(item.value),
+          name: item.label,
         };
-        const blog: IBlog = {
-          blog: {
-            ...formDataFormat,
-            content: JSON.stringify(outputData),
-          },
+      }),
+      tags: formData.tags.map((item: any) => {
+        return {
+          id: Number(item.value),
+          name: item.label,
         };
-        if (id) {
-          blog.blog.id = id;
-        }
-        await saveBlog(blog);
-      })
-      .catch((error) => {
-        console.log("Saving failed: ", error);
-      });
+      }),
+    };
+    const blog: IBlog = {
+      blog: {
+        ...formDataFormat,
+        content: JSON.stringify(markdown),
+      },
+    };
+    if (id) {
+      blog.blog.id = id;
+    }
+    await saveBlog(blog);
   };
 
   const saveBlog = async (blog: IBlog) => {
@@ -190,15 +178,6 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
     if (res.code === 200) {
       console.log("保存成功");
     }
-  };
-
-  const onFinish = (values: any) => {
-    save();
-    console.log("Received values of form: ", values);
-  };
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
   };
 
   const [tagOptions, setTagOptions] = useState<SelectProps["options"]>([]);
@@ -297,19 +276,154 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
     getCategory();
     if (id) {
       initBlogField(id);
-    } else {
-      const e = initEditor("editorjs", undefined);
-      setEditor(e);
     }
   }, [id]);
 
   return (
-    <>
+    <div className="h-screen flex-col overflow-scroll">
+      <Modal title="Basic Modal" open={isModalVisible} onOk={handleSave}>
+        <Form
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
+          form={form}
+          name="dynamic_form_complex"
+          style={{ maxWidth: 600 }}
+          autoComplete="off"
+          initialValues={{ words: [{}] }}
+        >
+          <Form.Item label="单词" name="word">
+            <Input />
+          </Form.Item>
+          <Form.Item label="定义">
+            <Form.List name="definition">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item noStyle name={[subField.name, "partOfSpeech"]}>
+                        <Select
+                          style={{ width: 140 }}
+                          options={[
+                            { value: "noun", label: "n. (名词)" },
+                            { value: "verb", label: "v. (动词)" },
+                            { value: "adjective", label: "adj. (形容词)" },
+                            { value: "adverb", label: "adv. (副词)" },
+                            { value: "pronoun", label: "pron. (代词)" },
+                            { value: "preposition", label: "prep. (介词)" },
+                            { value: "conjunction", label: "conj. (连词)" },
+                            {
+                              value: "interjection",
+                              label: "interj. (感叹词)",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                      <Form.Item noStyle name={[subField.name, "description"]}>
+                        <Input placeholder="释义" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加定义
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+          <Form.Item label="短语">
+            <Form.List name="phrase">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item
+                        noStyle
+                        name={[subField.name, "englishPhrase"]}
+                      >
+                        <Input placeholder="短语" />
+                      </Form.Item>
+                      <Form.Item
+                        noStyle
+                        name={[subField.name, "chineseTranslation"]}
+                      >
+                        <Input placeholder="释义" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加短语
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+          <Form.Item label="例句">
+            <Form.List name="example">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item noStyle name={[subField.name, "sentence"]}>
+                        <Input placeholder="例句" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加例句
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+
+          <Form.Item noStyle shouldUpdate>
+            {() => (
+              <Typography>
+                <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>
+              </Typography>
+            )}
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Button type="primary" onClick={save}>
+        保存
+      </Button>
       <Form
-        form={form}
+        form={formBlog}
         name="register"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         style={{ maxWidth: 600 }}
         scrollToFirstError
       >
@@ -400,17 +514,47 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         </Form.Item>
         {id ? (
           <img
-            src={`${config.FILE}${form.getFieldValue("imgUrl")}`}
+            src={`${config.FILE}${formBlog.getFieldValue("imgUrl")}`}
             alt="cover"
           />
         ) : null}
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            保存
-          </Button>
-        </Form.Item>
       </Form>
-      <div id="editorjs"></div>
-    </>
+      <div className="flex justify-center items-center flex-1 h-full">
+        <Dropdown menu={{ items }} trigger={["contextMenu"]}>
+          <TextArea
+            id="libra_input"
+            onChange={markdownChange}
+            value={markdown}
+            className="flex-1 !h-full"
+          />
+        </Dropdown>
+        <Markdown
+          className="flex-1 h-full"
+          rehypePlugins={[rehypeRaw]}
+          remarkPlugins={[remarkGfm]}
+          children={markdown}
+          components={{
+            code(props) {
+              const { children, className, ...rest } = props;
+              const match = /language-(\w+)/.exec(className || "");
+              return match ? (
+                <SyntaxHighlighter
+                  {...rest}
+                  PreTag="div"
+                  children={String(children).replace(/\n$/, "")}
+                  language={match[1]}
+                  style={dark}
+                  ref={null}
+                />
+              ) : (
+                <code {...rest} className={className}>
+                  {children}
+                </code>
+              );
+            },
+          }}
+        />
+      </div>
+    </div>
   );
 };

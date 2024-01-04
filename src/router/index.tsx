@@ -23,6 +23,10 @@ import { BlogHomeView } from "@/views/blog/home";
 import { BlogRecentView } from "@/views/blog/list";
 import { BlogLayout } from "@/layout/blog";
 import { BlogDetailView } from "@/views/blog/detail";
+import { BlogCategoryView } from "@/views/blog/category";
+import { BlogTagView } from "@/views/blog/tag";
+import { BlogWordView } from "@/views/blog/word";
+import { WordListView } from "@/views/admin/blog/wlist";
 
 const routers = [
   {
@@ -54,6 +58,19 @@ const routers = [
           },
         ],
       },
+      {
+        path: "word",
+        children: [
+          {
+            path: "/admin/word",
+            element: <Navigate to="/admin/word/list" />,
+          },
+          {
+            path: "list",
+            element: <WordListView />,
+          },
+        ],
+      },
     ],
   },
   {
@@ -71,6 +88,18 @@ const routers = [
       {
         path: "detail/:id",
         element: <BlogDetailView />,
+      },
+      {
+        path: "category",
+        element: <BlogCategoryView />,
+      },
+      {
+        path: "tag",
+        element: <BlogTagView />,
+      },
+      {
+        path: "word",
+        element: <BlogWordView />,
       },
     ],
   },

@@ -55,6 +55,17 @@ export const AdminLayout: React.FC = () => {
         },
       ],
     },
+    {
+      key: "/admin/word",
+      icon: <VideoCameraOutlined />,
+      label: <Link to="/admin/word">单词</Link>,
+      children: [
+        {
+          key: "/admin/word/list",
+          label: <Link to="/admin/word">单词管理</Link>,
+        },
+      ],
+    },
   ];
 
   return (

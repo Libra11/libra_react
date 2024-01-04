@@ -1,36 +1,32 @@
 /**
  * Author: Libra
- * Date: 2023-12-28 14:22:20
+ * Date: 2024-01-03 17:31:06
  * LastEditors: Libra
  * Description:
  */
-
 import {
-  ICategorys,
-  ITags,
-  blogInfo,
-  deleteBlogApi,
-  getBlogsApi,
-} from "@/api/blog";
-import { config } from "@/api/config";
-import { BlogCom } from "@/components/Blog";
+  deleteWordApi,
+  getWordByIdApi,
+  getWordsApi,
+  wordInfo,
+} from "@/api/word";
 import { formatTimestamp } from "@/utils";
-import { Modal, Popconfirm, Space, Table, Tag } from "antd";
+import { Modal, Popconfirm, Space, Table } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
 
-export const BlogListView: React.FC = () => {
-  const [dataSource, setDataSource] = useState<blogInfo[]>([]);
+export const WordListView: React.FC = () => {
+  const [dataSource, setDataSource] = useState<wordInfo[]>([]);
   const [paginationProps, setPaginationProps] = useState({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [blogId, setBlogId] = useState(0);
+  const [, setWordId] = useState(0);
 
   const showModal = (id: number) => {
-    console.log(id);
-    setBlogId(id);
+    setWordId(id);
     setIsModalOpen(true);
+    getWordByIdApi({ id });
   };
 
   const handleOk = () => {
@@ -42,23 +38,20 @@ export const BlogListView: React.FC = () => {
   };
 
   useEffect(() => {
-    getBlogList(page, pageSize);
+    getWordsList(page, pageSize);
   }, []);
 
-  const getBlogList = async (page: number, pageSize: number) => {
-    const res = await getBlogsApi({
+  const getWordsList = async (page: number, pageSize: number) => {
+    const res = await getWordsApi({
       page,
       pageSize,
-      title: "",
-      tagId: 0,
-      categoryId: 0,
     });
     if (res.code === 200) {
-      const blogs = res.data.blogs.map((blog, index) => ({
-        ...blog,
+      const words = res.data.words.map((word, index) => ({
+        ...word,
         key: index,
       }));
-      setDataSource(blogs);
+      setDataSource(words);
       const pp = {
         showSizeChanger: true,
         showQuickJumper: false,
@@ -68,27 +61,31 @@ export const BlogListView: React.FC = () => {
         pageSizeOptions: ["10", "20", "30", "40"],
         total: res.data.total,
         onShowSizeChange: async (current: number, ps: number) => {
-          await getBlogList(current, ps);
+          await getWordsList(current, ps);
           setPage(current);
           setPageSize(ps);
         },
         onChange: (current: number) => {
           if (current === page) return;
-          getBlogList(current, pageSize);
+          getWordsList(current, pageSize);
           setPage(current);
         },
       };
       setPaginationProps(pp);
     }
   };
-
-  const deleteBlog = async (id: number) => {
-    const res = await deleteBlogApi({ id });
+  const getBlogById = async (id: number) => {
+    const res = await getWordByIdApi({ id });
     if (res.code === 200) {
-      getBlogList(page, pageSize);
+      console.log(res.data);
     }
   };
-  // 表格分页属性
+  const deleteWord = async (id: number) => {
+    const res = await deleteWordApi({ id });
+    if (res.code === 200) {
+      getWordsList(page, pageSize);
+    }
+  };
   return (
     <div>
       <Modal
@@ -96,14 +93,15 @@ export const BlogListView: React.FC = () => {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        width={1600}
+        width={800}
       >
-        {isModalOpen && <BlogCom id={blogId} />}
+        {isModalOpen && <div>dddd</div>}
       </Modal>
       <Table dataSource={dataSource} pagination={paginationProps}>
-        <Column title="标题" dataIndex="title" key="title" />
-        <Column title="作者" dataIndex="author" key="author" />
-        <Column title="描述" dataIndex="desc" key="desc" />
+        <Column title="单词" dataIndex="word" key="word" />
+        <Column title="定义" dataIndex="definition" key="definition" />
+        <Column title="示例" dataIndex="example" key="example" />
+        <Column title="短语" dataIndex="phrase" key="phrase" />
         <Column
           title="创建时间"
           dataIndex="createAt"
@@ -111,30 +109,6 @@ export const BlogListView: React.FC = () => {
           render={(createAt: number) => (
             <>
               <span>{formatTimestamp(createAt)}</span>
-            </>
-          )}
-        />
-        <Column
-          title="标签"
-          dataIndex="tags"
-          key="tags"
-          render={(tags: ITags[]) => (
-            <>
-              {(tags || []).map((tag) => (
-                <Tag key={tag.id}>{tag.name}</Tag>
-              ))}
-            </>
-          )}
-        />
-        <Column
-          title="分类"
-          dataIndex="category"
-          key="category"
-          render={(categories: ICategorys[]) => (
-            <>
-              {(categories || []).map((category) => (
-                <Tag key={category.id}>{category.name}</Tag>
-              ))}
             </>
           )}
         />
@@ -149,29 +123,15 @@ export const BlogListView: React.FC = () => {
           )}
         />
         <Column
-          title="封面图"
-          dataIndex="imgUrl"
-          key="imgUrl"
-          render={(cover: string) =>
-            cover ? (
-              <img
-                className=" w-20"
-                src={`${config.FILE}${cover}`}
-                alt="cover"
-              />
-            ) : null
-          }
-        />
-        <Column
           title="操作"
           key="action"
           render={(value) => (
             <Space size="middle">
               <a onClick={() => showModal(value.id)}>编辑</a>
               <Popconfirm
-                title="删除博客"
+                title="删除单词"
                 description="确定删除?"
-                onConfirm={() => deleteBlog(value.id)}
+                onConfirm={() => deleteWord(value.id)}
                 okText="确定"
                 cancelText="取消"
               >
