@@ -51,8 +51,10 @@ function getWordsApi(
   });
 }
 
-function getWordByIdApi(data: { id: number }): Promise<ResponseData<IWord>> {
-  return fetch<IWord>(`blog/getWordById?id=${data.id}`);
+function getWordByIdApi(data: {
+  id: number;
+}): Promise<ResponseData<{ word: IWord }>> {
+  return fetch<{ word: IWord }>(`blog/getWordById?id=${data.id}`);
 }
 
 export { addWordApi, deleteWordApi, getWordsApi, getWordByIdApi };

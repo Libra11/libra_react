@@ -8,10 +8,12 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/es/storage";
 import user from "@/store/user";
+import system from "@/store/system";
 
 // combineReducers合并reducer
 const reducers = combineReducers({
   user,
+  system,
 });
 
 const persistConfig = {
