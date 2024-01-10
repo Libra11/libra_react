@@ -10,9 +10,9 @@ import { Outlet } from "react-router-dom";
 
 export const BlogLayout: React.FC = () => {
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full min-h-full flex flex-col bg-[var(--bg-color)]">
       <HeaderCom />
-      <div className=" flex-1 bg-[var(--bg-color)]">
+      <div className="font-['montserrat']">
         <Outlet />
       </div>
       <FooterCom />

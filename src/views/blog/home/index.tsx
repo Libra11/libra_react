@@ -10,7 +10,12 @@ import { useSelector } from "react-redux";
 export const BlogHomeView: React.FC = () => {
   const isDark = useSelector((state: any) => state.system.isDark);
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div
+      className="w-full flex items-center justify-center"
+      style={{
+        height: "calc(100vh - 100px)",
+      }}
+    >
       <div className="flex-1 h-full flex items-center justify-center">
         <div className="w-[450px] flex-col items-start justify-center">
           <div className=" text-[3.5rem] leading-[4.5rem] font-bold text-[var(--main-color)]">

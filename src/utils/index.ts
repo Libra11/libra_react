@@ -45,12 +45,12 @@ const upload = async (file: File, onProgress?: any) => {
   }
 };
 
-function formatTimestamp(timestamp: number) {
+function formatTimestamp(timestamp: number, hasTime: boolean = true) {
   // 将毫秒转换为日期对象
   const date = new Date(timestamp);
 
   // 使用toLocaleString格式化日期和时间
-  const formatted = date.toLocaleString("zh-CN", {
+  const formattedHaveTime = date.toLocaleString("zh-CN", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -59,8 +59,14 @@ function formatTimestamp(timestamp: number) {
     second: "2-digit",
   });
 
+  const formattedNoTime = date.toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
   // 将格式化的日期和时间返回
-  return formatted;
+  return hasTime ? formattedHaveTime : formattedNoTime;
 }
 
 export { upload, formatTimestamp };

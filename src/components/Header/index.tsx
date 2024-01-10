@@ -18,7 +18,7 @@ export const HeaderCom: React.FC = () => {
   };
   const isDark = useSelector((state: any) => state.system.isDark);
   return (
-    <div className="flex justify-between items-center h-[100px] bg-[var(--bg-color)] px-8">
+    <div className="sticky top-0 left-0 flex justify-between items-center h-[100px] bg-[var(--bg-color)] px-8">
       <div className=" flex items-center justify-center">
         <SvgIcon name={isDark ? "logo_dark" : "logo"} size={24} />
         <span className=" ml-1 text-[var(--main-color)] text-xl font-bold">
