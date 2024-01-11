@@ -28,6 +28,7 @@ export const BlogDetailView: React.FC = () => {
     definition: [],
     phrase: [],
     example: [],
+    phonetic: "",
   });
   const [anchor, setAnchor] = useState([]);
   const initBlogField = async () => {
@@ -45,7 +46,7 @@ export const BlogDetailView: React.FC = () => {
     const x = event.clientX;
     const y = event.clientY;
     return `
-        position: absolute;
+        position: fixed;
         top: ${y + 10}px;
         left: ${x + 10}px;
       `;
@@ -58,7 +59,7 @@ export const BlogDetailView: React.FC = () => {
     if (!article || !popup) return;
 
     // 在文章上添加鼠标悬停事件监听器
-    article.addEventListener("mouseover", async (event: any) => {
+    article.addEventListener("click", async (event: any) => {
       // 检查鼠标悬停的元素是否是自定义标签
       if (event.target.className === "word") {
         const styleStr = checkMousePosition(event);
@@ -70,7 +71,7 @@ export const BlogDetailView: React.FC = () => {
         // get word info
         const res = await getWordByIdApi({ id: Number(wordId) });
         if (res.code === 200) {
-          const { word, definition, phrase, example } = res.data.word;
+          const { word, definition, phrase, example, phonetic } = res.data.word;
           const d = JSON.parse(definition);
           const p = JSON.parse(phrase);
           const e = JSON.parse(example);
@@ -79,14 +80,15 @@ export const BlogDetailView: React.FC = () => {
             definition: d,
             phrase: p,
             example: e,
+            phonetic,
           });
         }
       }
     });
 
-    article.addEventListener("mouseout", function (event: any) {
+    article.addEventListener("click", function (event: any) {
       // 检查鼠标移开的元素是否是自定义标签
-      if (event.target.className === "word") {
+      if (event.target.className !== "word") {
         popup.style.cssText = "";
         popup.style.display = "none"; // 隐藏弹窗
       }
@@ -133,11 +135,11 @@ export const BlogDetailView: React.FC = () => {
   function getMarginClass(level: number) {
     const mapping: any = {
       1: "ml-0",
-      2: "ml-2",
-      3: "ml-4",
-      4: "ml-6",
-      5: "ml-8",
-      6: "ml-10",
+      2: "ml-4",
+      3: "ml-8",
+      4: "ml-12",
+      5: "ml-16",
+      6: "ml-20",
     };
     return mapping[level] || "ml-1";
   }
@@ -153,37 +155,64 @@ export const BlogDetailView: React.FC = () => {
     <div className="blog-content w-[1280px] m-auto h-full">
       <div
         id="popup"
-        style={{ display: "none", position: "absolute" }}
-        className=" w-40 h-40 border border-gray-500 rounded-lg bg-white"
+        style={{ display: "none", position: "fixed" }}
+        className=" w-[260px] shadow-md rounded-lg border border-[var(--card-border)] bg-[var(--bg-color)] text-[var(--text-color2)] p-4"
       >
         <div>
-          <div>
-            单词： <span className="text-red-500">{word.word}</span>
+          <div className="flex items-center justify-between">
+            <div className="font-bold text-[var(--main-color)]">
+              {word.word}
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-center mr-2 cursor-pointer">
+                <SvgIcon name="voice" size={14} />
+                <span className=" text-xs">UK</span>
+              </div>
+              <div className="flex items-center justify-center cursor-pointer">
+                <SvgIcon name="voice" size={14} />
+                <span className=" text-xs">US</span>
+              </div>
+            </div>
           </div>
-          <div>
-            定义：
+          <div className="my-2 text-sm">{word.phonetic}</div>
+          <div className="my-2">
             {word.definition.map((item: any, id: number) => {
               return (
-                <div key={id}>
-                  {item.partOfSpeech} {item.description}
+                <div
+                  key={id}
+                  className="flex flex-col items-start justify-center"
+                >
+                  <span className=" font-bold">{item.partOfSpeech}</span>
+                  <span>{item.description}</span>
                 </div>
               );
             })}
           </div>
-          <div>
-            例句：
+          <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+          <div className="my-2">
+            <span className=" font-bold ">Example</span>
             {word.phrase.map((item: any, id: number) => {
               return (
-                <div key={id}>
-                  {item.englishPhrase} {item.chineseTranslation}
+                <div key={id} className="flex justify-start items-start">
+                  <div className=" w-4">{id + 1}、</div>
+                  <div className="flex-1">
+                    <div>
+                      {item.englishPhrase}：{item.chineseTranslation}
+                    </div>
+                  </div>
                 </div>
               );
             })}
           </div>
-          <div>
-            短语：
-            {word.example.map((item: any) => {
-              return <div key={item.id}>{item.sentence}</div>;
+          <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+          <div className="mt-2">
+            <div className=" font-bold">Phrase</div>
+            {word.example.map((item: any, id: number) => {
+              return (
+                <div key={item.id}>
+                  {id + 1}、{item.sentence}
+                </div>
+              );
             })}
           </div>
         </div>
@@ -240,7 +269,7 @@ export const BlogDetailView: React.FC = () => {
             </div>
           ) : null}
           <Markdown
-            className="flex-1 h-full"
+            className="flex-1 h-full mt-4"
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
             children={markdown}
@@ -281,7 +310,8 @@ export const BlogDetailView: React.FC = () => {
                       key={id}
                       onClick={() => {
                         if (item.head) {
-                          item.head.scrollIntoView();
+                          item.head.scrollIntoView({ block: "start" });
+                          window.scrollBy(0, -100);
                         }
                       }}
                       className={`cursor-pointer text-[var(--text-color1)] hover:text-[var(--primary-color)] 

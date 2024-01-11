@@ -72,7 +72,7 @@ function App() {
         },
       }}
     >
-      <div className=" w-screen h-screen font-['montserrat']">
+      <div className=" w-screen  font-['montserrat']">
         <BrowserRouter>
           <Router />
         </BrowserRouter>

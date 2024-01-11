@@ -118,7 +118,7 @@ export const BlogRecentView: React.FC = () => {
           <div className="mt-12 text-2xl font-bold text-[var(--main-color)]">
             Recently
           </div>
-          <div className="mt-4 flex-1">
+          <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
             {dataSource.map((blog) => (
               <BlogItem blog={blog} />
             ))}

@@ -33,14 +33,14 @@ export const BlogItem: React.FC<IBlogItem> = ({ blog }) => {
   return (
     <div
       onClick={goDetail}
-      className="w-[200px] h-[280px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] hover:shadow-lg transition-all flex flex-col items-start justify-start"
+      className="w-[220px] h-[320px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] hover:shadow-lg transition-all flex flex-col items-start justify-start mx-2"
     >
       <img
         className=" h-[106] w-full object-cover"
         src={`${config.FILE}${blog.imgUrl}`}
         alt=""
       />
-      <div className="flex-1 p-2 flex flex-col items-start justify-center">
+      <div className="w-full flex-1 p-2 flex flex-col items-start justify-center">
         <div className="text-base text-[var(--main-color)] font-bold overflow-ellipsis line-clamp-2 mb-1">
           {blog.title}
         </div>
@@ -50,7 +50,7 @@ export const BlogItem: React.FC<IBlogItem> = ({ blog }) => {
         <div className="text-xs text-[var(--text-color1)] overflow-ellipsis line-clamp-2 mt-2">
           {blog.desc}
         </div>
-        <div className=" text-xs mt-4 flex items-center justify-between w-full text-[var(--text-color1)]">
+        <div className="text-xs mt-4 flex items-center justify-between w-full text-[var(--text-color1)]">
           <div className="flex items-center justify-center">
             <SvgIcon name="time" size={16} color="text-[var(--text-color1)]" />
             <div>{formatTimestamp(blog.createAt, false)}</div>

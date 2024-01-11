@@ -11,6 +11,7 @@ export type IWord = {
   definition: string;
   example: string;
   phrase: string;
+  phonetic: string;
   createAt: number;
   updateAt: number;
 };
