@@ -71,7 +71,7 @@ export const BlogRecentView: React.FC = () => {
       <div className="w-[1280px] m-auto flex justify-center items-start">
         <div className=" w-[940px] pl-5 pr-10">
           <div
-            className=" transition-all w-full h-[250px] rounded-[20px] hover:shadow-lg border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden"
+            className=" transition-all w-full h-[250px] rounded-[20px] border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden hover:shadow-[4px_4px_20px_8px_rgba(0,0,0,0.1)]"
             onClick={() => goDetail(dataSource[0].id)}
           >
             <img
@@ -119,13 +119,13 @@ export const BlogRecentView: React.FC = () => {
             Recently
           </div>
           <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
-            {dataSource.map((blog) => (
-              <BlogItem blog={blog} />
+            {dataSource.map((blog, idx) => (
+              <BlogItem key={idx} blog={blog} />
             ))}
           </div>
           <Pagination className="mt-4 text-right" {...paginationProps} />
         </div>
-        <div className=" mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] hover:shadow-md cursor-pointer relative border border-[var(--card-border)]">
+        <div className=" mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] cursor-pointer relative border border-[var(--card-border)]">
           <img
             className="absolute w-[100px] h-[100px] -top-[50px] left-[90px] border-2 border-[var(--primary-color)] rounded-full"
             src={avatar}

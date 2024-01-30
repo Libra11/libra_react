@@ -13,32 +13,21 @@ import {
   getBlogsApi,
 } from "@/api/blog";
 import { config } from "@/api/config";
-import { BlogCom } from "@/components/Blog";
 import { formatTimestamp } from "@/utils";
-import { Modal, Popconfirm, Space, Table, Tag } from "antd";
+import { Popconfirm, Space, Table, Tag } from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const BlogListView: React.FC = () => {
   const [dataSource, setDataSource] = useState<blogInfo[]>([]);
   const [paginationProps, setPaginationProps] = useState({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [blogId, setBlogId] = useState(0);
+  const navigate = useNavigate();
 
-  const showModal = (id: number) => {
-    console.log(id);
-    setBlogId(id);
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const goEdit = (id: number) => {
+    navigate(`/admin/blog/edit/${id}`);
   };
 
   useEffect(() => {
@@ -91,19 +80,10 @@ export const BlogListView: React.FC = () => {
   // 表格分页属性
   return (
     <div>
-      <Modal
-        title="编辑博客"
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={1600}
-      >
-        {isModalOpen && <BlogCom id={blogId} />}
-      </Modal>
       <Table dataSource={dataSource} pagination={paginationProps}>
         <Column title="标题" dataIndex="title" key="title" />
         <Column title="作者" dataIndex="author" key="author" />
-        <Column title="描述" dataIndex="desc" key="desc" />
+        <Column title="描述" dataIndex="desc" key="desc" className=" w-96" />
         <Column
           title="创建时间"
           dataIndex="createAt"
@@ -167,7 +147,7 @@ export const BlogListView: React.FC = () => {
           key="action"
           render={(value) => (
             <Space size="middle">
-              <a onClick={() => showModal(value.id)}>编辑</a>
+              <a onClick={() => goEdit(value.id)}>编辑</a>
               <Popconfirm
                 title="删除博客"
                 description="确定删除?"

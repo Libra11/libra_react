@@ -33,10 +33,10 @@ export const BlogItem: React.FC<IBlogItem> = ({ blog }) => {
   return (
     <div
       onClick={goDetail}
-      className="w-[220px] h-[320px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] hover:shadow-lg transition-all flex flex-col items-start justify-start mx-2"
+      className="w-[220px] h-[320px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] transition-all flex flex-col items-start justify-start mx-2 hover:shadow-[4px_4px_20px_8px_rgba(0,0,0,0.1)]"
     >
       <img
-        className=" h-[106] w-full object-cover"
+        className=" h-[158px] w-full object-cover"
         src={`${config.FILE}${blog.imgUrl}`}
         alt=""
       />

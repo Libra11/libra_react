@@ -27,6 +27,7 @@ import { BlogCategoryView } from "@/views/blog/category";
 import { BlogTagView } from "@/views/blog/tag";
 import { BlogWordView } from "@/views/blog/word";
 import { WordListView } from "@/views/admin/blog/wlist";
+import { EditBlogView } from "@/views/admin/blog/edit";
 
 const routers = [
   {
@@ -55,6 +56,10 @@ const routers = [
           {
             path: "add",
             element: <AddBlogView />,
+          },
+          {
+            path: "edit/:id",
+            element: <EditBlogView />,
           },
         ],
       },
@@ -121,7 +126,11 @@ export default function Router() {
   const token = useSelector((state: RootState) => state.user.token);
   useEffect(() => {
     const whiteList = ["/login", "/404"];
-    if (whiteList.includes(location.pathname)) {
+    console.log("location.pathname", location.pathname);
+    if (
+      whiteList.includes(location.pathname) ||
+      location.pathname.includes("/blog")
+    ) {
       return;
     } else if (token) {
       return;

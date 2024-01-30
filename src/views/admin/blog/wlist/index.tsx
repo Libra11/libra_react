@@ -74,12 +74,12 @@ export const WordListView: React.FC = () => {
       setPaginationProps(pp);
     }
   };
-  const getBlogById = async (id: number) => {
-    const res = await getWordByIdApi({ id });
-    if (res.code === 200) {
-      console.log(res.data);
-    }
-  };
+  // const getBlogById = async (id: number) => {
+  //   const res = await getWordByIdApi({ id });
+  //   if (res.code === 200) {
+  //     console.log(res.data);
+  //   }
+  // };
   const deleteWord = async (id: number) => {
     const res = await deleteWordApi({ id });
     if (res.code === 200) {

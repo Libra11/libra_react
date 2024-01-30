@@ -7,7 +7,7 @@
 import "./index.scss";
 import { useParams } from "react-router-dom";
 import { IBlog, getBlogByIdApi } from "@/api/blog";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -18,6 +18,7 @@ import { config } from "@/api/config";
 import { formatTimestamp } from "@/utils";
 import SvgIcon from "@/components/Svg";
 import { TagCom } from "@/components/Tag";
+import { Spin } from "antd";
 
 export const BlogDetailView: React.FC = () => {
   const { id } = useParams();
@@ -30,6 +31,7 @@ export const BlogDetailView: React.FC = () => {
     example: [],
     phonetic: "",
   });
+  const [loadingWord, setLoadingWord] = useState(false);
   const [anchor, setAnchor] = useState([]);
   const initBlogField = async () => {
     if (!id) return;
@@ -69,6 +71,7 @@ export const BlogDetailView: React.FC = () => {
         // get data-id
         const wordId = event.target.getAttribute("data-word");
         // get word info
+        setLoadingWord(true);
         const res = await getWordByIdApi({ id: Number(wordId) });
         if (res.code === 200) {
           const { word, definition, phrase, example, phonetic } = res.data.word;
@@ -82,6 +85,7 @@ export const BlogDetailView: React.FC = () => {
             example: e,
             phonetic,
           });
+          setLoadingWord(false);
         }
       }
     });
@@ -91,6 +95,13 @@ export const BlogDetailView: React.FC = () => {
       if (event.target.className !== "word") {
         popup.style.cssText = "";
         popup.style.display = "none"; // 隐藏弹窗
+        setWord({
+          word: "",
+          definition: [],
+          phrase: [],
+          example: [],
+          phonetic: "",
+        });
       }
     });
   };
@@ -102,7 +113,6 @@ export const BlogDetailView: React.FC = () => {
     const treeJson: any = [];
     for (let i = 0; i < headList.length; i++) {
       const head = headList[i] as HTMLElement;
-      console.log(head);
       const text = head.innerText;
       const level = Number(head.tagName[1]);
       const item = {
@@ -144,12 +154,13 @@ export const BlogDetailView: React.FC = () => {
     return mapping[level] || "ml-1";
   }
 
+  useLayoutEffect(() => {
+    displayWord();
+    getMarkdownAnchor();
+  }, [blogInfo]);
+
   useEffect(() => {
     initBlogField();
-    setTimeout(() => {
-      displayWord();
-      getMarkdownAnchor();
-    }, 500);
   }, []);
   return (
     <div className="blog-content w-[1280px] m-auto h-full">
@@ -158,84 +169,93 @@ export const BlogDetailView: React.FC = () => {
         style={{ display: "none", position: "fixed" }}
         className=" w-[260px] shadow-md rounded-lg border border-[var(--card-border)] bg-[var(--bg-color)] text-[var(--text-color2)] p-4"
       >
-        <div>
-          <div className="flex items-center justify-between">
-            <div className="font-bold text-[var(--main-color)]">
-              {word.word}
-            </div>
+        {loadingWord ? (
+          <Spin />
+        ) : (
+          <div>
             <div className="flex items-center justify-between">
-              <div className="flex items-center justify-center mr-2 cursor-pointer">
-                <SvgIcon name="voice" size={14} />
-                <span className=" text-xs">UK</span>
+              <div className="font-bold text-[var(--main-color)]">
+                {word.word}
               </div>
-              <div className="flex items-center justify-center cursor-pointer">
-                <SvgIcon name="voice" size={14} />
-                <span className=" text-xs">US</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center justify-center mr-2 cursor-pointer">
+                  <SvgIcon name="voice" size={14} />
+                  <span className=" text-xs">UK</span>
+                </div>
+                <div className="flex items-center justify-center cursor-pointer">
+                  <SvgIcon name="voice" size={14} />
+                  <span className=" text-xs">US</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="my-2 text-sm">{word.phonetic}</div>
-          <div className="my-2">
-            {word.definition.map((item: any, id: number) => {
-              return (
-                <div
-                  key={id}
-                  className="flex flex-col items-start justify-center"
-                >
-                  <span className=" font-bold">{item.partOfSpeech}</span>
-                  <span>{item.description}</span>
-                </div>
-              );
-            })}
-          </div>
-          <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
-          <div className="my-2">
-            <span className=" font-bold ">Example</span>
-            {word.phrase.map((item: any, id: number) => {
-              return (
-                <div key={id} className="flex justify-start items-start">
-                  <div className=" w-4">{id + 1}、</div>
-                  <div className="flex-1">
-                    <div>
-                      {item.englishPhrase}：{item.chineseTranslation}
+            <div className="my-2 text-sm text-[var(--primary-color)] font-bold">
+              {word.phonetic}
+            </div>
+            <div className="my-2">
+              {word.definition.map((item: any, id: number) => {
+                return (
+                  <div key={id}>
+                    <span className=" font-bold">{item.partOfSpeech}：</span>
+                    <span>{item.description}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+            <div className="my-2">
+              <span className=" font-bold ">Phrase</span>
+              {word.phrase.map((item: any, id: number) => {
+                return (
+                  <div key={id} className="flex justify-start items-start">
+                    <div className=" w-4">{id + 1}、</div>
+                    <div className="flex-1">
+                      <div>
+                        {item.englishPhrase}：{item.chineseTranslation}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+            <div className="mt-2">
+              <div className=" font-bold">Example</div>
+              {word.example.map((item: any, id: number) => {
+                return (
+                  <div key={id}>
+                    {id + 1}、{item.sentence}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
-          <div className="mt-2">
-            <div className=" font-bold">Phrase</div>
-            {word.example.map((item: any, id: number) => {
-              return (
-                <div key={item.id}>
-                  {id + 1}、{item.sentence}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        )}
       </div>
-      <div className="h-full flex items-start justify-center">
+      <div className="w-full h-full flex items-start justify-center">
         <div
           id="article"
-          className=" leading-8 flex-1 text-[var(--text-color1)]"
+          className=" leading-8 w-[968px] text-[var(--text-color1)]"
         >
           {blogInfo ? (
             <div>
               <div className=" text-4xl font-bold mt-2 text-[var(--main-color)] overflow-ellipsis line-clamp-2">
                 {blogInfo.blog.title}
               </div>
-              <div className="flex justify-between items-center">
-                <div className="">
+              <div className="flex justify-between items-center my-2">
+                <div className="flex">
                   {blogInfo.blog.category.map((item: any) => (
-                    <TagCom key={item.id} tag={item} />
+                    <div className="flex" key={item.id}>
+                      <TagCom key={item.id} tag={item} />
+                      <div className=" w-1"></div>
+                    </div>
                   ))}
                 </div>
-                <div className="">
+                <div className="flex">
                   {blogInfo.blog.tags.map((item: any) => (
-                    <TagCom key={item.id} tag={item} />
+                    <div className="flex" key={item.id}>
+                      <TagCom key={item.id} tag={item} />
+                      <div className=" w-1"></div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -262,14 +282,14 @@ export const BlogDetailView: React.FC = () => {
                 </div>
               </div>
               <img
-                className="w-full object-cover mt-4 rounded-lg"
+                className="w-full object-cover mt-1 rounded-lg"
                 src={`${config.FILE}${blogInfo.blog.imgUrl}`}
                 alt=""
               />
             </div>
           ) : null}
           <Markdown
-            className="flex-1 h-full mt-4"
+            className="h-full mt-4"
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
             children={markdown}
@@ -299,7 +319,7 @@ export const BlogDetailView: React.FC = () => {
         </div>
         <div className="w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
           {
-            <div className="p-4">
+            <div className="p-4 w-full">
               <div className="text-[var(--main-color)] font-bold text-xl">
                 Anchor
               </div>
@@ -317,7 +337,7 @@ export const BlogDetailView: React.FC = () => {
                       className={`cursor-pointer text-[var(--text-color1)] hover:text-[var(--primary-color)] 
                         ${getMarginClass(item.level)}`}
                     >
-                      {item.text}
+                      - {item.text}
                     </div>
                   );
                 })}

@@ -15,7 +15,6 @@ import {
   Space,
   Dropdown,
   Modal,
-  Typography,
   MenuProps,
   message,
 } from "antd";
@@ -37,9 +36,10 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import { CloseOutlined } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import TextArea from "antd/es/input/TextArea";
 import { addWordApi } from "@/api/word";
+import "./index.scss";
 
 interface BlogComProps {
   id?: number;
@@ -82,6 +82,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
       const paramWord = {
         word: {
           word: formData.word,
+          phonetic: formData.phonetic,
           definition: JSON.stringify(formData.definition),
           phrase: JSON.stringify(formData.phrase),
           example: JSON.stringify(formData.example),
@@ -280,11 +281,14 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   }, [id]);
 
   return (
-    <div className="h-screen flex-col overflow-scroll">
-      <Modal title="Basic Modal" open={isModalVisible} onOk={handleSave}>
+    <div className="h-full flex-col flex justify-start items-start">
+      <Modal
+        title="Basic Modal"
+        open={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        onOk={handleSave}
+      >
         <Form
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 18 }}
           form={form}
           name="dynamic_form_complex"
           style={{ maxWidth: 600 }}
@@ -292,6 +296,9 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           initialValues={{ words: [{}] }}
         >
           <Form.Item label="单词" name="word">
+            <Input />
+          </Form.Item>
+          <Form.Item label="音标" name="phonetic">
             <Input />
           </Form.Item>
           <Form.Item label="定义">
@@ -408,128 +415,130 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
               )}
             </Form.List>
           </Form.Item>
-
-          <Form.Item noStyle shouldUpdate>
-            {() => (
-              <Typography>
-                <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>
-              </Typography>
-            )}
-          </Form.Item>
         </Form>
       </Modal>
-      <Button type="primary" onClick={save}>
-        保存
-      </Button>
-      <Form
-        form={formBlog}
-        name="register"
-        style={{ maxWidth: 600 }}
-        scrollToFirstError
-      >
-        <Form.Item
-          name="title"
-          label="标题"
-          rules={[
-            {
-              message: "请输入标题!",
-            },
-          ]}
+      <div>
+        <Button type="primary" onClick={save}>
+          保存
+        </Button>
+        <Form
+          form={formBlog}
+          name="register"
+          className="flex justify-start items-start w-full mt-3"
+          scrollToFirstError
         >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="desc"
-          label="描述"
-          rules={[
-            {
-              message: "请输入描述!",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item name="category" label="分类">
-          <Select
-            labelInValue
-            mode="tags"
-            style={{ width: "100%" }}
-            placeholder="分类"
-            onChange={handleCategoryChange}
-            options={categoryOptions}
-            dropdownRender={(menu) => (
-              <>
-                {menu}
-                <Divider style={{ margin: "8px 0" }} />
-                <Space style={{ padding: "0 8px 4px" }}>
-                  <Input
-                    placeholder="请输入分类"
-                    ref={inputCategoryRef}
-                    value={category}
-                    onChange={onCategoryChange}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                  <Button
-                    type="text"
-                    icon={<PlusOutlined />}
-                    onClick={addCategory}
-                  >
-                    添加分类
-                  </Button>
-                </Space>
-              </>
-            )}
-          />
-        </Form.Item>
-        <Form.Item name="tags" label="标签">
-          <Select
-            labelInValue
-            mode="tags"
-            style={{ width: "100%" }}
-            placeholder="标签"
-            onChange={handleTagChange}
-            options={tagOptions}
-            dropdownRender={(menu) => (
-              <>
-                {menu}
-                <Divider style={{ margin: "8px 0" }} />
-                <Space style={{ padding: "0 8px 4px" }}>
-                  <Input
-                    placeholder="请输入标签"
-                    ref={inputTagRef}
-                    value={tag}
-                    onChange={onTagChange}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                  <Button type="text" icon={<PlusOutlined />} onClick={addTag}>
-                    添加标签
-                  </Button>
-                </Space>
-              </>
-            )}
-          />
-        </Form.Item>
-        <Form.Item label="封面图" name="imgUrl">
-          <AliyunOSSUpload title={id ? "更换" : "上传"} />
-        </Form.Item>
-        {id ? (
-          <img
-            src={`${config.FILE}${formBlog.getFieldValue("imgUrl")}`}
-            alt="cover"
-          />
-        ) : null}
-      </Form>
-      <div className="flex justify-center items-center flex-1 h-full">
+          <div className=" w-[500px] mr-6">
+            <Form.Item
+              name="title"
+              label="标题"
+              rules={[
+                {
+                  message: "请输入标题!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="desc"
+              label="描述"
+              rules={[
+                {
+                  message: "请输入描述!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item name="category" label="分类">
+              <Select
+                labelInValue
+                mode="tags"
+                style={{ width: "100%" }}
+                placeholder="分类"
+                onChange={handleCategoryChange}
+                options={categoryOptions}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider style={{ margin: "8px 0" }} />
+                    <Space style={{ padding: "0 8px 4px" }}>
+                      <Input
+                        placeholder="请输入分类"
+                        ref={inputCategoryRef}
+                        value={category}
+                        onChange={onCategoryChange}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                      <Button
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={addCategory}
+                      >
+                        添加分类
+                      </Button>
+                    </Space>
+                  </>
+                )}
+              />
+            </Form.Item>
+            <Form.Item name="tags" label="标签">
+              <Select
+                labelInValue
+                mode="tags"
+                style={{ width: "100%" }}
+                placeholder="标签"
+                onChange={handleTagChange}
+                options={tagOptions}
+                dropdownRender={(menu) => (
+                  <>
+                    {menu}
+                    <Divider style={{ margin: "8px 0" }} />
+                    <Space style={{ padding: "0 8px 4px" }}>
+                      <Input
+                        placeholder="请输入标签"
+                        ref={inputTagRef}
+                        value={tag}
+                        onChange={onTagChange}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                      <Button
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={addTag}
+                      >
+                        添加标签
+                      </Button>
+                    </Space>
+                  </>
+                )}
+              />
+            </Form.Item>
+          </div>
+          <div className="w-[500px]">
+            <Form.Item label="封面图" name="imgUrl">
+              <AliyunOSSUpload title={id ? "更换" : "上传"} />
+            </Form.Item>
+            {id ? (
+              <img
+                src={`${config.FILE}${formBlog.getFieldValue("imgUrl")}`}
+                alt="cover"
+              />
+            ) : null}
+          </div>
+        </Form>
+      </div>
+      <div className="flex justify-center items-start flex-1 overflow-auto w-full mt-3">
         <Dropdown menu={{ items }} trigger={["contextMenu"]}>
           <TextArea
             id="libra_input"
             onChange={markdownChange}
             value={markdown}
-            className="flex-1 !h-full"
+            className="flex-1 !h-full overflow-auto"
           />
         </Dropdown>
         <Markdown
-          className="flex-1 h-full"
+          className="text-[var(--text-color1)] flex-1 h-full border border-[var(--card-border)] rounded-lg p-5 ml-5 overflow-auto"
           rehypePlugins={[rehypeRaw]}
           remarkPlugins={[remarkGfm]}
           children={markdown}
@@ -543,7 +552,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
                   PreTag="div"
                   children={String(children).replace(/\n$/, "")}
                   language={match[1]}
-                  style={dark}
+                  style={atomDark}
                   ref={null}
                 />
               ) : (

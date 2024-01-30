@@ -5,7 +5,7 @@
  * Description:
  */
 interface ITagProps {
-  id: string;
+  id: number;
   name: string;
 }
 export const TagCom: React.FC<{

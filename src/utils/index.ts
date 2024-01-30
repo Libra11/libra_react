@@ -6,6 +6,13 @@
  */
 import { getOssTokenApi } from "@/api/blog";
 
+/**
+ * Uploads a file to the server.
+ *
+ * @param file - The file to be uploaded.
+ * @param onProgress - Optional callback function to track the upload progress.
+ * @returns A Promise that resolves to the uploaded file URL if successful, or rejects with an error message.
+ */
 const upload = async (file: File, onProgress?: any) => {
   const r = await getOssTokenApi();
   if (r.code === 200) {
@@ -45,6 +52,12 @@ const upload = async (file: File, onProgress?: any) => {
   }
 };
 
+/**
+ * 格式化时间戳为指定格式的日期字符串
+ * @param timestamp - 要格式化的时间戳（单位：毫秒）
+ * @param hasTime - 是否包含时间，默认为 true
+ * @returns 格式化后的日期字符串
+ */
 function formatTimestamp(timestamp: number, hasTime: boolean = true) {
   // 将毫秒转换为日期对象
   const date = new Date(timestamp);

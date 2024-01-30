@@ -30,6 +30,7 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("App");
     if (isDark) {
       switchDarkColor();
       setMyTheme({ algorithm: theme.darkAlgorithm });

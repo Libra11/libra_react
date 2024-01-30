@@ -32,9 +32,9 @@ export const HeaderCom: React.FC = () => {
         <Link className={IsActive("/blog/recent")} to="/blog/recent">
           blog
         </Link>
-        <Link className={IsActive("/blog/word")} to="/blog/word">
+        {/* <Link className={IsActive("/blog/word")} to="/blog/word">
           vocabulary
-        </Link>
+        </Link> */}
         <Link className={IsActive("/blog/category")} to="/blog/category">
           category
         </Link>

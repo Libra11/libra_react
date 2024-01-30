@@ -97,7 +97,7 @@ export const AdminLayout: React.FC = () => {
           style={{
             margin: "24px 16px",
             padding: 24,
-            minHeight: 280,
+            minHeight: "calc(100vh - 112px)",
             background: colorBgContainer,
           }}
         >
