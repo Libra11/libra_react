@@ -5,15 +5,27 @@
  * Description:
  */
 import {
+  addWordApi,
   deleteWordApi,
   getWordByIdApi,
   getWordsApi,
   wordInfo,
 } from "@/api/word";
 import { formatTimestamp } from "@/utils";
-import { Modal, Popconfirm, Space, Table } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  message,
+} from "antd";
 import Column from "antd/es/table/Column";
 import { useEffect, useState } from "react";
+import { CloseOutlined } from "@ant-design/icons";
 
 export const WordListView: React.FC = () => {
   const [dataSource, setDataSource] = useState<wordInfo[]>([]);
@@ -22,19 +34,53 @@ export const WordListView: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [, setWordId] = useState(0);
+  const [form] = Form.useForm();
+  const [messageApi] = message.useMessage();
 
-  const showModal = (id: number) => {
+  const showModal = async (id: number) => {
     setWordId(id);
     setIsModalOpen(true);
-    getWordByIdApi({ id });
+    const res = await getWordByIdApi({ id });
+    if (res.code === 200) {
+      const { word } = res.data;
+      word.definition = JSON.parse(word.definition);
+      word.phrase = JSON.parse(word.phrase);
+      word.example = JSON.parse(word.example);
+      form.setFieldsValue(word);
+    }
   };
 
   const handleOk = () => {
-    setIsModalOpen(false);
+    saveWord().then(() => {
+      form.resetFields();
+      setIsModalOpen(false);
+      getWordsList(page, pageSize);
+    });
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const saveWord = () => {
+    // eslint-disable-next-line no-async-promise-executor
+    return new Promise(async (resolve, reject) => {
+      const formData = form.getFieldsValue();
+      const paramWord = {
+        word: {
+          word: formData.word,
+          phonetic: formData.phonetic,
+          definition: JSON.stringify(formData.definition),
+          phrase: JSON.stringify(formData.phrase),
+          example: JSON.stringify(formData.example),
+          createAt: new Date().getTime(),
+          updateAt: new Date().getTime(),
+        },
+      };
+      const res = await addWordApi(paramWord);
+      if (res.code === 200) {
+        messageApi.success("添加成功");
+        resolve(res.data);
+      } else {
+        reject(res);
+      }
+    });
   };
 
   useEffect(() => {
@@ -74,12 +120,6 @@ export const WordListView: React.FC = () => {
       setPaginationProps(pp);
     }
   };
-  // const getBlogById = async (id: number) => {
-  //   const res = await getWordByIdApi({ id });
-  //   if (res.code === 200) {
-  //     console.log(res.data);
-  //   }
-  // };
   const deleteWord = async (id: number) => {
     const res = await deleteWordApi({ id });
     if (res.code === 200) {
@@ -89,19 +129,160 @@ export const WordListView: React.FC = () => {
   return (
     <div>
       <Modal
-        title="编辑博客"
+        title="编辑单词"
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={800}
+        onCancel={() => {
+          setIsModalOpen(false);
+          form.resetFields();
+        }}
+        onOk={() => handleOk()}
       >
-        {isModalOpen && <div>dddd</div>}
+        <Form
+          form={form}
+          name="dynamic_form_complex"
+          style={{ maxWidth: 600 }}
+          autoComplete="off"
+          initialValues={{ words: [{}] }}
+        >
+          <Form.Item label="单词" name="word">
+            <Input />
+          </Form.Item>
+          <Form.Item label="音标" name="phonetic">
+            <Input />
+          </Form.Item>
+          <Form.Item label="定义">
+            <Form.List name="definition">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item noStyle name={[subField.name, "partOfSpeech"]}>
+                        <Select
+                          style={{ width: 140 }}
+                          options={[
+                            { value: "noun", label: "n. (名词)" },
+                            { value: "verb", label: "v. (动词)" },
+                            { value: "adjective", label: "adj. (形容词)" },
+                            { value: "adverb", label: "adv. (副词)" },
+                            { value: "pronoun", label: "pron. (代词)" },
+                            { value: "preposition", label: "prep. (介词)" },
+                            { value: "conjunction", label: "conj. (连词)" },
+                            {
+                              value: "interjection",
+                              label: "interj. (感叹词)",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                      <Form.Item noStyle name={[subField.name, "description"]}>
+                        <Input placeholder="释义" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加定义
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+          <Form.Item label="短语">
+            <Form.List name="phrase">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item
+                        noStyle
+                        name={[subField.name, "englishPhrase"]}
+                      >
+                        <Input placeholder="短语" />
+                      </Form.Item>
+                      <Form.Item
+                        noStyle
+                        name={[subField.name, "chineseTranslation"]}
+                      >
+                        <Input placeholder="释义" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加短语
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+          <Form.Item label="例句">
+            <Form.List name="example">
+              {(subFields, subOpt) => (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    rowGap: 16,
+                  }}
+                >
+                  {subFields.map((subField) => (
+                    <Space key={subField.key}>
+                      <Form.Item noStyle name={[subField.name, "sentence"]}>
+                        <Input placeholder="例句" />
+                      </Form.Item>
+                      <CloseOutlined
+                        onClick={() => {
+                          subOpt.remove(subField.name);
+                        }}
+                      />
+                    </Space>
+                  ))}
+                  <Button type="dashed" onClick={() => subOpt.add()} block>
+                    + 添加例句
+                  </Button>
+                </div>
+              )}
+            </Form.List>
+          </Form.Item>
+        </Form>
       </Modal>
       <Table dataSource={dataSource} pagination={paginationProps}>
         <Column title="单词" dataIndex="word" key="word" />
-        <Column title="定义" dataIndex="definition" key="definition" />
-        <Column title="示例" dataIndex="example" key="example" />
-        <Column title="短语" dataIndex="phrase" key="phrase" />
+        <Column
+          title="定义"
+          dataIndex="definition"
+          key="definition"
+          render={(definition: string) =>
+            JSON.parse(definition).map((item: any, index: number) => {
+              return (
+                <div key={index}>
+                  <div>{item.partOfSpeech}</div>
+                  <div>{item.description}</div>
+                </div>
+              );
+            })
+          }
+        />
         <Column
           title="创建时间"
           dataIndex="createAt"

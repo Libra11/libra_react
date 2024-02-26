@@ -51,6 +51,15 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   const [form] = Form.useForm();
   const [formBlog] = Form.useForm();
   const [messageApi] = message.useMessage();
+  const [createAt, setCreateAt] = useState<number>(0);
+  const [selectText, setSelectText] = useState<string>("");
+  const [JSONStr, setJSONStr] = useState<string>("");
+  const onJSONChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setJSONStr(e.target.value);
+    const obj = JSON.parse(e.target.value);
+    console.log(obj);
+    form.setFieldsValue(obj);
+  };
 
   const markdownChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMarkdown(e.target.value);
@@ -64,12 +73,13 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         ) as HTMLTextAreaElement;
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
-        const selectText = window.getSelection()?.toString();
         const replaceText = `<span class="word" data-word="${res.id}">${selectText}</span>`;
         setMarkdown(
           markdown.substring(0, start) + replaceText + markdown.substring(end)
         );
         setIsModalVisible(false);
+        form.resetFields();
+        setJSONStr("");
       })
       .catch((err) => {
         messageApi.error(err.message);
@@ -108,15 +118,14 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           <div className="mr-2">添加单词</div>
         </div>
       ),
-      onClick: () => setIsModalVisible(true),
-    },
-    {
-      key: "2",
-      label: (
-        <div className="flex items-center">
-          <div className="mr-2">修改单词</div>
-        </div>
-      ),
+      onClick: () => {
+        setIsModalVisible(true);
+        setTimeout(() => {
+          form.setFieldsValue({
+            word: selectText,
+          });
+        }, 0);
+      },
     },
   ];
   const initBlogField = async (id: number) => {
@@ -138,6 +147,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         })),
       };
       formBlog.setFieldsValue(formData);
+      setCreateAt(blog.createAt);
       setMarkdown(content);
     }
   };
@@ -145,7 +155,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
     const formData = formBlog.getFieldsValue();
     const formDataFormat = {
       ...formData,
-      createAt: new Date().getTime(),
+      createAt: createAt || new Date().getTime(),
       updateAt: new Date().getTime(),
       audioFile: "",
       author: "Libra",
@@ -275,9 +285,19 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   useEffect(() => {
     getTags();
     getCategory();
+    const article = document.getElementById("libra_input");
+    if (article) {
+      article.addEventListener("select", () => {
+        const selectText = window.getSelection()?.toString();
+        setSelectText(selectText || "");
+      });
+    }
     if (id) {
       initBlogField(id);
     }
+    return () => {
+      article?.removeEventListener("select", () => {});
+    };
   }, [id]);
 
   return (
@@ -285,7 +305,11 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
       <Modal
         title="Basic Modal"
         open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        onCancel={() => {
+          setIsModalVisible(false);
+          form.resetFields();
+          setJSONStr("");
+        }}
         onOk={handleSave}
       >
         <Form
@@ -416,11 +440,13 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
             </Form.List>
           </Form.Item>
         </Form>
+        <Input
+          placeholder="请输入JSON格式的数据"
+          value={JSONStr}
+          onChange={onJSONChange}
+        />
       </Modal>
       <div>
-        <Button type="primary" onClick={save}>
-          保存
-        </Button>
         <Form
           form={formBlog}
           name="register"
@@ -528,7 +554,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           </div>
         </Form>
       </div>
-      <div className="flex justify-center items-start flex-1 overflow-auto w-full mt-3">
+      <div className="flex justify-center items-start max-h-[1200px] overflow-auto w-full mt-3">
         <Dropdown menu={{ items }} trigger={["contextMenu"]}>
           <TextArea
             id="libra_input"
@@ -564,6 +590,9 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           }}
         />
       </div>
+      <Button type="primary" onClick={save} className=" mt-2">
+        保存
+      </Button>
     </div>
   );
 };

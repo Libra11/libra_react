@@ -47,6 +47,15 @@ export const BlogDetailView: React.FC = () => {
     // 获取鼠标的位置
     const x = event.clientX;
     const y = event.clientY;
+    // 判断鼠标位置相对于浏览器窗口的位置是偏上还是偏下
+    // 如果是偏下，弹窗显示在鼠标上方
+    if (window.innerHeight - y < 500) {
+      return `
+        position: fixed;
+        bottom: ${window.innerHeight - y + 10}px;
+        left: ${x + 10}px;
+      `;
+    }
     return `
         position: fixed;
         top: ${y + 10}px;
@@ -75,9 +84,9 @@ export const BlogDetailView: React.FC = () => {
         const res = await getWordByIdApi({ id: Number(wordId) });
         if (res.code === 200) {
           const { word, definition, phrase, example, phonetic } = res.data.word;
-          const d = JSON.parse(definition);
-          const p = JSON.parse(phrase);
-          const e = JSON.parse(example);
+          const d = definition ? JSON.parse(definition) : [];
+          const p = phrase ? JSON.parse(phrase) : [];
+          const e = example ? JSON.parse(example) : [];
           setWord({
             word,
             definition: d,
@@ -177,16 +186,7 @@ export const BlogDetailView: React.FC = () => {
               <div className="font-bold text-[var(--main-color)]">
                 {word.word}
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center justify-center mr-2 cursor-pointer">
-                  <SvgIcon name="voice" size={14} />
-                  <span className=" text-xs">UK</span>
-                </div>
-                <div className="flex items-center justify-center cursor-pointer">
-                  <SvgIcon name="voice" size={14} />
-                  <span className=" text-xs">US</span>
-                </div>
-              </div>
+              <div className="flex items-center justify-between"></div>
             </div>
             <div className="my-2 text-sm text-[var(--primary-color)] font-bold">
               {word.phonetic}
@@ -334,10 +334,11 @@ export const BlogDetailView: React.FC = () => {
                           window.scrollBy(0, -100);
                         }
                       }}
-                      className={`cursor-pointer text-[var(--text-color1)] hover:text-[var(--primary-color)] 
+                      className={`flex items-start justify-start cursor-pointer text-[var(--text-color1)] hover:text-[var(--primary-color)] 
                         ${getMarginClass(item.level)}`}
                     >
-                      - {item.text}
+                      <div className=" mr-2">-</div>
+                      <div>{item.text}</div>
                     </div>
                   );
                 })}

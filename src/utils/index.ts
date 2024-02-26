@@ -82,4 +82,23 @@ function formatTimestamp(timestamp: number, hasTime: boolean = true) {
   return hasTime ? formattedHaveTime : formattedNoTime;
 }
 
-export { upload, formatTimestamp };
+function debounce<F extends (...args: any[]) => any>(
+  func: F,
+  wait: number
+): (...args: Parameters<F>) => void {
+  let timeout: NodeJS.Timeout | null;
+
+  return function executedFunction(...args: Parameters<F>) {
+    const later = () => {
+      clearTimeout(timeout!);
+      func(...args);
+    };
+
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
+}
+
+export { upload, formatTimestamp, debounce };

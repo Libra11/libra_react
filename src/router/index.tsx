@@ -15,6 +15,7 @@ import { AdminView } from "@/views/admin";
 import { AdminLayout } from "@/layout/admin";
 import { BlankLayout } from "@/layout/blank";
 import { AddBlogView } from "@/views/admin/blog/add";
+import { TagCategoryView } from "@/views/admin/blog/tagCategory";
 import { BlogListView } from "@/views/admin/blog/list";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -56,6 +57,10 @@ const routers = [
           {
             path: "add",
             element: <AddBlogView />,
+          },
+          {
+            path: "tc",
+            element: <TagCategoryView />,
           },
           {
             path: "edit/:id",

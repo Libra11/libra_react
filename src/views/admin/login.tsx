@@ -5,24 +5,15 @@
  * Description:
  */
 
-import { Tabs, TabsProps } from "antd";
+import { Card } from "antd";
 import { LoginCom } from "./login/login";
-import { RegisterCom } from "./login/register";
 
-const items: TabsProps["items"] = [
-  {
-    key: "1",
-    label: "登录",
-    children: <LoginCom />,
-  },
-  {
-    key: "2",
-    label: "注册",
-    children: <RegisterCom />,
-  },
-];
 export const LoginView: React.FC = () => (
-  <Tabs defaultActiveKey="1" items={items} />
+  <div className=" w-screen h-screen flex justify-center items-center">
+    <Card className=" w-[300px] h-[300px] rounded-lg flex justify-center items-center">
+      <LoginCom />
+    </Card>
+  </div>
 );
 
 export default LoginView;

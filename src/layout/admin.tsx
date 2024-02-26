@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme, MenuProps } from "antd";
 import { useEffect, useState } from "react";
+import SvgIcon from "@/components/Svg";
 
 const { Header, Sider, Content } = Layout;
 
@@ -53,6 +54,10 @@ export const AdminLayout: React.FC = () => {
           key: "/admin/blog/add",
           label: <Link to="/admin/blog/add">添加博客</Link>,
         },
+        {
+          key: "/admin/blog/tc",
+          label: <Link to="/admin/blog/tc">标签分类</Link>,
+        },
       ],
     },
     {
@@ -71,7 +76,10 @@ export const AdminLayout: React.FC = () => {
   return (
     <Layout className=" w-full h-full">
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className=" w-full h-16 mb-2 bg-orange-500" />
+        <div className=" flex justify-center items-center h-12">
+          <SvgIcon name="logo_dark" size={24} />
+          <span className=" ml-1 text-white text-xl font-bold">Libra</span>
+        </div>
         <Menu
           theme="dark"
           mode="inline"
