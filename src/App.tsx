@@ -5,13 +5,14 @@
  * Description:
  */
 import Router from "./router";
-import { ConfigProvider, theme } from "antd";
+import { Card, ConfigProvider, Layout, theme } from "antd";
 import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDark } from "./store/system";
 import { store } from "./store";
 import SvgIcon from "./components/Svg";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 function App() {
   const [myTheme, setMyTheme] = useState({
@@ -64,6 +65,23 @@ function App() {
     el.style.setProperty("--card-border", "#e0e0e0");
   };
 
+  const fallbackRender = ({ error }: FallbackProps) => {
+    return (
+      <Layout
+        role="alert"
+        className="w-screen h-screen flex items-center justify-center"
+      >
+        <Card
+          title="Something went wrong:"
+          bordered={false}
+          style={{ width: 300 }}
+        >
+          <p style={{ color: "red" }}>{error.toString()}</p>
+        </Card>
+      </Layout>
+    );
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -73,11 +91,13 @@ function App() {
         },
       }}
     >
-      <div className=" w-screen  font-['montserrat']">
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
-      </div>
+      <ErrorBoundary fallbackRender={fallbackRender} onReset={() => {}}>
+        <div className=" w-screen  font-['montserrat']">
+          <BrowserRouter>
+            <Router />
+          </BrowserRouter>
+        </div>
+      </ErrorBoundary>
       <div
         onClick={changeTheme}
         className="fixed right-12 bottom-8 w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg-color)] shadow-md cursor-pointer hover:shadow-xl border border-[var(--card-border)]"
