@@ -15,6 +15,7 @@ interface AliyunOSSUploadProps {
   value?: string | undefined;
   onChange?: (fileName: string | undefined) => void;
   title: string;
+  id?: string;
 }
 
 export const AliyunOSSUpload = ({
@@ -44,14 +45,15 @@ export const AliyunOSSUpload = ({
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
     fl = fileList;
     const files = fileList.map((file) => file.url);
-    onChange?.(files[0]);
+    const host = OSSData?.host;
+    onChange?.(`${host}/${files[0]}`);
   };
 
   const onRemove = (file: UploadFile) => {
     const files = value === file.url ? undefined : value;
-
+    const host = OSSData?.host;
     if (onChange) {
-      onChange(files);
+      onChange(`${host}/${files}`);
     }
   };
 
@@ -64,20 +66,15 @@ export const AliyunOSSUpload = ({
   });
 
   const beforeUpload: UploadProps["beforeUpload"] = async (file) => {
-    console.log(OSSData);
     if (!OSSData) return false;
-
     const expire = Number(OSSData.expire) * 1000;
-
     if (expire < Date.now()) {
       await init();
     }
-
     const filename = file.name;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     file.url = OSSData.dir + filename;
-
     return file;
   };
 

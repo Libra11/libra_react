@@ -176,7 +176,7 @@ export const BlogDetailView: React.FC = () => {
       <div
         id="popup"
         style={{ display: "none", position: "fixed" }}
-        className=" w-[260px] shadow-md rounded-lg border border-[var(--card-border)] bg-[var(--bg-color)] text-[var(--text-color2)] p-4"
+        className=" z-10 w-[260px] shadow-md rounded-lg border border-[var(--card-border)] bg-[var(--bg-color)] text-[var(--text-color2)] p-4"
       >
         {loadingWord ? (
           <Spin />
@@ -191,43 +191,55 @@ export const BlogDetailView: React.FC = () => {
             <div className="my-2 text-sm text-[var(--primary-color)] font-bold">
               {word.phonetic}
             </div>
-            <div className="my-2">
-              {word.definition.map((item: any, id: number) => {
-                return (
-                  <div key={id}>
-                    <span className=" font-bold">{item.partOfSpeech}：</span>
-                    <span>{item.description}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
-            <div className="my-2">
-              <span className=" font-bold ">Phrase</span>
-              {word.phrase.map((item: any, id: number) => {
-                return (
-                  <div key={id} className="flex justify-start items-start">
-                    <div className=" w-4">{id + 1}、</div>
-                    <div className="flex-1">
-                      <div>
-                        {item.englishPhrase}：{item.chineseTranslation}
+            {word.definition.length ? (
+              <div>
+                <div className="my-2">
+                  {word.definition.map((item: any, id: number) => {
+                    return (
+                      <div key={id}>
+                        <span className=" font-bold">
+                          {item.partOfSpeech}：
+                        </span>
+                        <span>{item.description}</span>
                       </div>
+                    );
+                  })}
+                </div>
+                <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+              </div>
+            ) : null}
+            {word.phrase.length ? (
+              <div>
+                <div className="my-2">
+                  <span className=" font-bold ">Phrase</span>
+                  {word.phrase.map((item: any, id: number) => {
+                    return (
+                      <div key={id} className="flex justify-start items-start">
+                        <div className=" w-4">{id + 1}、</div>
+                        <div className="flex-1">
+                          <div>
+                            {item.englishPhrase}：{item.chineseTranslation}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
+              </div>
+            ) : null}
+            {word.example.length ? (
+              <div className="mt-2">
+                <div className=" font-bold">Example</div>
+                {word.example.map((item: any, id: number) => {
+                  return (
+                    <div key={id}>
+                      {id + 1}、{item.sentence}
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className=" w-full h-[1px] bg-[var(--card-border)]"></div>
-            <div className="mt-2">
-              <div className=" font-bold">Example</div>
-              {word.example.map((item: any, id: number) => {
-                return (
-                  <div key={id}>
-                    {id + 1}、{item.sentence}
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         )}
       </div>
@@ -319,7 +331,7 @@ export const BlogDetailView: React.FC = () => {
         </div>
         <div className="w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
           {
-            <div className="p-4 w-full">
+            <div className="p-4 w-full max-h-[800px] overflow-scroll">
               <div className="text-[var(--main-color)] font-bold text-xl">
                 Anchor
               </div>

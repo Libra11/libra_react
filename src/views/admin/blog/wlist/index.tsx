@@ -43,9 +43,9 @@ export const WordListView: React.FC = () => {
     const res = await getWordByIdApi({ id });
     if (res.code === 200) {
       const { word } = res.data;
-      word.definition = JSON.parse(word.definition);
-      word.phrase = JSON.parse(word.phrase);
-      word.example = JSON.parse(word.example);
+      word.definition = word.definition ? JSON.parse(word.definition) : [];
+      word.phrase = word.phrase ? JSON.parse(word.phrase) : [];
+      word.example = word.example ? JSON.parse(word.example) : [];
       form.setFieldsValue(word);
     }
   };

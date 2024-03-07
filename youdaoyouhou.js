@@ -1,7 +1,7 @@
 /*
  * @Author: Libra
  * @Date: 2024-02-26 14:45:41
- * @LastEditors: 有道油猴脚本
+ * @LastEditors: Libra
  * @Description: 
  */
 
@@ -39,6 +39,7 @@ function getTitle() {
 
 function getPhonetic() {
   const phonetics = document.querySelectorAll('.per-phone')
+  if (!phonetics || !phonetics.length) return ''
   return phonetics[1].querySelector('.phonetic').textContent
 }
 
@@ -86,7 +87,7 @@ function getExample() {
       sentence
     })
   })
-
+  return res
 }
 
 const wordMap = {

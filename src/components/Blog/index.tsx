@@ -48,6 +48,7 @@ interface BlogComProps {
 export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   const [markdown, setMarkdown] = useState<string>("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [formBlog] = Form.useForm();
   const [messageApi] = message.useMessage();
@@ -110,6 +111,10 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
     });
   };
 
+  const [imageUrl, setImageUrl] = useState<string | undefined>();
+  const handleImageChange = (fileName: string | undefined) => {
+    setImageUrl(fileName);
+  };
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -125,6 +130,17 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
             word: selectText,
           });
         }, 0);
+      },
+    },
+    {
+      key: "2",
+      label: (
+        <div className="flex items-center">
+          <div className="mr-2">上传图片</div>
+        </div>
+      ),
+      onClick: () => {
+        setIsUploadModalVisible(true);
       },
     },
   ];
@@ -303,7 +319,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
   return (
     <div className="h-full flex-col flex justify-start items-start">
       <Modal
-        title="Basic Modal"
+        title="添加单词"
         open={isModalVisible}
         onCancel={() => {
           setIsModalVisible(false);
@@ -312,6 +328,10 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         }}
         onOk={handleSave}
       >
+        <iframe
+          className="w-0 h-0"
+          src={`https://www.youdao.com/result?word=${selectText}&lang=en`}
+        ></iframe>
         <Form
           form={form}
           name="dynamic_form_complex"
@@ -445,6 +465,26 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
           value={JSONStr}
           onChange={onJSONChange}
         />
+      </Modal>
+      <Modal
+        title="上传图片"
+        width={400}
+        open={isUploadModalVisible}
+        onCancel={() => {
+          setIsUploadModalVisible(false);
+          setImageUrl("");
+        }}
+        onOk={() => {
+          setIsUploadModalVisible(false);
+          setImageUrl("");
+        }}
+      >
+        <div className="flex flex-col justify-center items-center py-4">
+          <AliyunOSSUpload title={"上传图片"} onChange={handleImageChange} />
+          {imageUrl ? (
+            <div className=" w-[289px] p-2">![state]({imageUrl})</div>
+          ) : null}
+        </div>
       </Modal>
       <div>
         <Form
