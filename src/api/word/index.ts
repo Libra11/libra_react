@@ -58,4 +58,16 @@ function getWordByIdApi(data: {
   return fetch<{ word: IWord }>(`blog/getWordById?id=${data.id}`);
 }
 
-export { addWordApi, deleteWordApi, getWordsApi, getWordByIdApi };
+function getWordTranslateApi(
+  url: string
+): Promise<ResponseData<{ word: IWord }>> {
+  return fetch<{ word: IWord }>(`blog/getWordTranslate?word=${url}`);
+}
+
+export {
+  addWordApi,
+  deleteWordApi,
+  getWordsApi,
+  getWordByIdApi,
+  getWordTranslateApi,
+};

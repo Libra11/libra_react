@@ -38,7 +38,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import TextArea from "antd/es/input/TextArea";
-import { addWordApi } from "@/api/word";
+import { addWordApi, getWordTranslateApi } from "@/api/word";
 import "./index.scss";
 
 interface BlogComProps {
@@ -125,11 +125,9 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
       ),
       onClick: () => {
         setIsModalVisible(true);
-        setTimeout(() => {
-          form.setFieldsValue({
-            word: selectText,
-          });
-        }, 0);
+        setTimeout(async () => {
+          await getWordTranslate(selectText);
+        }, 200);
       },
     },
     {
@@ -298,6 +296,27 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
     }, 0);
   };
 
+  const getWordTranslate = async (word: string) => {
+    const url = `https://www.youdao.com/result?word=${word}%26lang=en`;
+    const res = await getWordTranslateApi(url);
+    if (res.code === 200) {
+      let { definition, phrase, example } = res.data.word;
+      const { phonetic, word: w } = res.data.word;
+      definition = definition ? JSON.parse(definition) : [];
+      phrase = phrase ? JSON.parse(phrase) : [];
+      example = example ? JSON.parse(example) : [];
+      const obj = {
+        word: w,
+        phonetic: phonetic || "",
+        definition,
+        phrase,
+        example,
+      };
+      setJSONStr(JSON.stringify(obj));
+      form.setFieldsValue(obj);
+    }
+  };
+
   useEffect(() => {
     getTags();
     getCategory();
@@ -328,10 +347,6 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         }}
         onOk={handleSave}
       >
-        <iframe
-          className="w-0 h-0"
-          src={`https://www.youdao.com/result?word=${selectText}&lang=en`}
-        ></iframe>
         <Form
           form={form}
           name="dynamic_form_complex"
