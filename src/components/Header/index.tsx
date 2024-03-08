@@ -17,7 +17,7 @@ export const HeaderCom: React.FC = () => {
     const location = useLocation();
     return location.pathname === path
       ? " text-[var(--primary-color)] mr-6"
-      : "mr-6 hover:text-[var(--main-color)]";
+      : "mr-6 hover:text-[var(--primary-color)]";
   };
   const isDark = useSelector((state: any) => state.system.isDark);
   const searchDebounce = debounce((value: string) => {
@@ -62,19 +62,22 @@ export const HeaderCom: React.FC = () => {
       </div>
       <div className="flex justify-center items-center text-[var(--text-color2)] text-base">
         <Link className={IsActive("/blog/home")} to="/blog/home">
-          home
+          HOME
         </Link>
         <Link className={IsActive("/blog/recent")} to="/blog/recent">
-          blog
+          BLOG
         </Link>
         {/* <Link className={IsActive("/blog/word")} to="/blog/word">
           vocabulary
         </Link> */}
         <Link className={IsActive("/blog/category")} to="/blog/category">
-          category
+          CATEGORY
         </Link>
         <Link className={IsActive("/blog/tag")} to="/blog/tag">
-          tag
+          TAG
+        </Link>
+        <Link className={IsActive("/blog/about")} to="/blog/about">
+          ABOUT
         </Link>
       </div>
       <div className=" relative">

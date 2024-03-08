@@ -7,14 +7,26 @@
 import Router from "./router";
 import { Card, ConfigProvider, Layout, theme } from "antd";
 import { useEffect, useState } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDark } from "./store/system";
 import { store } from "./store";
 import SvgIcon from "./components/Svg";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import "./style/transition.css";
 
 function App() {
+  return (
+    <div className=" w-screen h-screen bg-[var(--bg-color)] font-['montserrat']">
+      <BrowserRouter>
+        <MyComponent />
+      </BrowserRouter>
+    </div>
+  );
+}
+function MyComponent() {
+  const location = useLocation();
   const [myTheme, setMyTheme] = useState({
     algorithm: theme.defaultAlgorithm,
   });
@@ -91,13 +103,15 @@ function App() {
         },
       }}
     >
-      <ErrorBoundary fallbackRender={fallbackRender} onReset={() => {}}>
-        <div className=" w-screen  font-['montserrat']">
-          <BrowserRouter>
-            <Router />
-          </BrowserRouter>
-        </div>
-      </ErrorBoundary>
+      <TransitionGroup>
+        <CSSTransition key={location.key} classNames="fade" timeout={300}>
+          <ErrorBoundary fallbackRender={fallbackRender} onReset={() => {}}>
+            <div className=" w-screen  font-['montserrat']">
+              <Router />
+            </div>
+          </ErrorBoundary>
+        </CSSTransition>
+      </TransitionGroup>
       <div
         onClick={changeTheme}
         className="fixed right-12 bottom-8 w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg-color)] shadow-md cursor-pointer hover:shadow-xl border border-[var(--card-border)]"

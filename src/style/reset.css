@@ -354,3 +354,7 @@ video {
   height: 2px;
   background-color: #f5f5f5;
 }
+
+:root {
+  --animate-delay: 0.1s;
+}

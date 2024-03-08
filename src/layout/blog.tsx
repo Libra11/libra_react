@@ -10,12 +10,13 @@ import { Outlet } from "react-router-dom";
 
 export const BlogLayout: React.FC = () => {
   return (
-    <div className="w-full min-h-full flex flex-col bg-[var(--bg-color)]">
+    <div className="w-full h-full flex flex-col bg-[var(--bg-color)]">
       <HeaderCom />
       <div
         className="font-['montserrat']"
         style={{
-          minHeight: "calc(100vh - 100px)",
+          height: "calc(100vh - 100px)",
+          overflow: "auto",
         }}
       >
         <Outlet />

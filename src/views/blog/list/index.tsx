@@ -71,7 +71,7 @@ export const BlogRecentView: React.FC = () => {
       <div className="w-[1280px] m-auto flex justify-center items-start">
         <div className=" w-[940px] pl-5 pr-10">
           <div
-            className=" transition-all w-full h-[250px] rounded-[20px] border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden hover:shadow-[4px_4px_20px_8px_rgba(0,0,0,0.1)]"
+            className="animate__animated animate__backInDown transition-all w-full h-[250px] rounded-[20px] border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden"
             onClick={() => goDetail(dataSource[0].id)}
           >
             <img
@@ -125,13 +125,13 @@ export const BlogRecentView: React.FC = () => {
           </div>
           <Pagination className="mt-4 text-right" {...paginationProps} />
         </div>
-        <div className=" mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] cursor-pointer relative border border-[var(--card-border)]">
+        <div className="animate__animated animate__backInRight mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] cursor-pointer relative border border-[var(--card-border)]">
           <img
             className="absolute w-[100px] h-[100px] -top-[50px] left-[90px] border-2 border-[var(--primary-color)] rounded-full"
             src={avatar}
             alt=""
           />
-          <div className="mt-16 px-4">
+          <div className="mt-16 px-4 pb-2 ">
             <div className="mb-4 text-center font-bold text-2xl text-[var(--main-color)]">
               Libra
             </div>
@@ -156,7 +156,7 @@ export const BlogRecentView: React.FC = () => {
               </span>
             </div>
             <div className="flex justify-center items-center ">
-              <button className="bg-[var(--bg-color)] border-2 border-[var(--primary-color)] text-[var(--main-color)] px-4 py-2 rounded-full shadow-md hover:shadow-xl mt-4">
+              <button className="bg-[var(--primary-color)] flex justify-center items-center text-white px-6 py-3 rounded-full hvr-outline-out mt-5">
                 <span>Follow</span>
               </button>
             </div>

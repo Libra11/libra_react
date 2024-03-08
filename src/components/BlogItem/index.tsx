@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { TagCom } from "../Tag";
 import { formatTimestamp } from "@/utils";
 import SvgIcon from "../Svg";
+import "./index.scss";
 
 /**
  * Author: Libra
@@ -33,7 +34,7 @@ export const BlogItem: React.FC<IBlogItem> = ({ blog }) => {
   return (
     <div
       onClick={goDetail}
-      className="w-[220px] h-[320px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] transition-all flex flex-col items-start justify-start mx-2 hover:shadow-[4px_4px_20px_8px_rgba(0,0,0,0.1)]"
+      className="image_scale animate__animated animate__headShake w-[220px] h-[320px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] transition-all flex flex-col items-start justify-start mx-2"
     >
       <img
         className=" h-[158px] w-full object-cover"

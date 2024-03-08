@@ -29,8 +29,13 @@ import { BlogTagView } from "@/views/blog/tag";
 import { BlogWordView } from "@/views/blog/word";
 import { WordListView } from "@/views/admin/blog/wlist";
 import { EditBlogView } from "@/views/admin/blog/edit";
+import { AboutView } from "@/views/blog/about";
 
 const routers = [
+  {
+    path: "/",
+    element: <Navigate to="/blog/home" />,
+  },
   {
     path: "/admin",
     element: <AdminLayout />,
@@ -110,6 +115,10 @@ const routers = [
       {
         path: "word",
         element: <BlogWordView />,
+      },
+      {
+        path: "about",
+        element: <AboutView />,
       },
     ],
   },

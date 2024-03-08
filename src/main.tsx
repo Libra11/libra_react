@@ -11,7 +11,8 @@ import { Provider } from "react-redux";
 import "./style/index.css";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistStore } from "redux-persist";
-import 'virtual:svg-icons-register';
+import "virtual:svg-icons-register";
+import "animate.css";
 
 const persistor = persistStore(store);
 ReactDOM.createRoot(document.getElementById("root")!).render(

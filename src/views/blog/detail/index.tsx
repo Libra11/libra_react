@@ -243,7 +243,7 @@ export const BlogDetailView: React.FC = () => {
           </div>
         )}
       </div>
-      <div className="w-full h-full flex items-start justify-center">
+      <div className="w-full flex items-start justify-center">
         <div
           id="article"
           className=" leading-8 w-[968px] text-[var(--text-color1)]"
@@ -331,7 +331,7 @@ export const BlogDetailView: React.FC = () => {
         </div>
         <div className="w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
           {
-            <div className="p-4 w-full max-h-[800px] overflow-scroll">
+            <div className="p-4 w-full max-h-[800px] overflow-auto">
               <div className="text-[var(--main-color)] font-bold text-xl">
                 Anchor
               </div>
