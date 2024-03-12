@@ -16,7 +16,6 @@ export const BlogLayout: React.FC = () => {
         className="font-['montserrat']"
         style={{
           height: "calc(100vh - 100px)",
-          overflow: "auto",
         }}
       >
         <Outlet />

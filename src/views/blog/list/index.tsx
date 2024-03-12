@@ -1,5 +1,4 @@
 import { blogInfo, getBlogsApi } from "@/api/blog";
-import { config } from "@/api/config";
 import { BlogItem } from "@/components/BlogItem";
 import SvgIcon from "@/components/Svg";
 import { TagCom } from "@/components/Tag";
@@ -76,7 +75,7 @@ export const BlogRecentView: React.FC = () => {
           >
             <img
               className=" h-full w-[280px] object-cover"
-              src={`${config.FILE}${dataSource[0].imgUrl}`}
+              src={`${dataSource[0].imgUrl}`}
               alt=""
             />
             <div className="pl-5 pr-20 py-5 flex-1 flex flex-col items-start justify-center">

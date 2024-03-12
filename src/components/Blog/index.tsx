@@ -30,10 +30,12 @@ import {
   getBlogByIdApi,
 } from "@/api/blog";
 import { PlusOutlined } from "@ant-design/icons";
-import { config } from "@/api/config";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { CloseOutlined } from "@ant-design/icons";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -601,10 +603,7 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
               <AliyunOSSUpload title={id ? "更换" : "上传"} />
             </Form.Item>
             {id ? (
-              <img
-                src={`${config.FILE}${formBlog.getFieldValue("imgUrl")}`}
-                alt="cover"
-              />
+              <img src={`${formBlog.getFieldValue("imgUrl")}`} alt="cover" />
             ) : null}
           </div>
         </Form>
@@ -620,8 +619,8 @@ export const BlogCom: React.FC<BlogComProps> = ({ id }) => {
         </Dropdown>
         <Markdown
           className="text-[var(--text-color1)] flex-1 h-full border border-[var(--card-border)] rounded-lg p-5 ml-5 overflow-auto"
-          rehypePlugins={[rehypeRaw]}
-          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw, rehypeKatex]}
+          remarkPlugins={[remarkGfm, remarkMath]}
           children={markdown}
           components={{
             code(props) {

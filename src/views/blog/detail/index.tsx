@@ -11,10 +11,12 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getWordByIdApi } from "@/api/word";
-import { config } from "@/api/config";
 import { formatTimestamp } from "@/utils";
 import SvgIcon from "@/components/Svg";
 import { TagCom } from "@/components/Tag";
@@ -295,15 +297,15 @@ export const BlogDetailView: React.FC = () => {
               </div>
               <img
                 className="w-full object-cover mt-1 rounded-lg"
-                src={`${config.FILE}${blogInfo.blog.imgUrl}`}
+                src={`${blogInfo.blog.imgUrl}`}
                 alt=""
               />
             </div>
           ) : null}
           <Markdown
             className="h-full mt-4"
-            rehypePlugins={[rehypeRaw]}
-            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeKatex]}
+            remarkPlugins={[remarkGfm, remarkMath]}
             children={markdown}
             components={{
               code(props) {

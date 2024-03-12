@@ -12,7 +12,6 @@ import {
   deleteBlogApi,
   getBlogsApi,
 } from "@/api/blog";
-import { config } from "@/api/config";
 import { formatTimestamp } from "@/utils";
 import { Popconfirm, Space, Table, Tag } from "antd";
 import Column from "antd/es/table/Column";
@@ -134,11 +133,7 @@ export const BlogListView: React.FC = () => {
           key="imgUrl"
           render={(cover: string) =>
             cover ? (
-              <img
-                className=" w-20"
-                src={`${config.FILE}${cover}`}
-                alt="cover"
-              />
+              <img className=" w-20" src={`${cover}`} alt="cover" />
             ) : null
           }
         />
