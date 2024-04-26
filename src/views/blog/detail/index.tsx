@@ -174,7 +174,7 @@ export const BlogDetailView: React.FC = () => {
     initBlogField();
   }, []);
   return (
-    <div className="blog-content w-[1280px] m-auto h-full">
+    <div className="blog-content w-full overflow-auto   h-full">
       <div
         id="popup"
         style={{ display: "none", position: "fixed" }}
@@ -245,7 +245,7 @@ export const BlogDetailView: React.FC = () => {
           </div>
         )}
       </div>
-      <div className="w-full flex items-start justify-center">
+      <div className="w-[1280px] m-auto h-full  flex items-start justify-center">
         <div
           id="article"
           className=" leading-8 w-[968px] text-[var(--text-color1)]"

@@ -33,7 +33,7 @@ export const BlogItem: React.FC<IBlogItem> = ({ blog }) => {
   return (
     <div
       onClick={goDetail}
-      className="image_scale animate__animated animate__headShake w-[200px] h-[300px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] transition-all flex flex-col items-start justify-start mx-2"
+      className="image_scale animate__animated animate__headShake w-[200px] h-[300px] rounded-lg overflow-hidden cursor-pointer border border-[var(--card-border)] transition-all flex flex-col items-start justify-start mx-2 mt-3"
     >
       <img
         className=" h-[158px] w-full object-cover"
