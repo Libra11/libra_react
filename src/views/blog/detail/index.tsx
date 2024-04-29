@@ -20,7 +20,7 @@ import { getWordByIdApi } from "@/api/word";
 import { formatTimestamp } from "@/utils";
 import SvgIcon from "@/components/Svg";
 import { TagCom } from "@/components/Tag";
-import { Spin } from "antd";
+import { Collapse, Spin } from "antd";
 
 export const BlogDetailView: React.FC = () => {
   const { id } = useParams();
@@ -153,6 +153,15 @@ export const BlogDetailView: React.FC = () => {
   //   setAnchor(treeJson);
   // };
 
+  const memoizedFunction = (function () {
+    const cache: any = {};
+    return function (args: number) {
+      if (!(args in cache)) {
+        cache[args] = getMarginClass(args);
+      }
+      return cache[args];
+    };
+  })();
   function getMarginClass(level: number) {
     const mapping: any = {
       1: "ml-0",
@@ -245,10 +254,10 @@ export const BlogDetailView: React.FC = () => {
           </div>
         )}
       </div>
-      <div className="w-[1280px] m-auto h-full  flex items-start justify-center">
+      <div className="w-full md:w-[1280px] m-auto h-full  flex items-start justify-center">
         <div
           id="article"
-          className=" leading-8 w-[968px] text-[var(--text-color1)]"
+          className="px-2 md:px-0 leading-8 w-full md:w-[968px] text-[var(--text-color1)]"
         >
           {blogInfo ? (
             <div>
@@ -295,6 +304,34 @@ export const BlogDetailView: React.FC = () => {
                   </div>
                 </div>
               </div>
+              <div className="md:hidden my-2">
+                <Collapse
+                  items={[
+                    {
+                      key: "1",
+                      label: "Anchor",
+                      children: anchor.map((item: any, id: number) => {
+                        return (
+                          <div
+                            key={id}
+                            onClick={() => {
+                              if (item.head) {
+                                item.head.scrollIntoView({ block: "start" });
+                                window.scrollBy(0, -100);
+                              }
+                            }}
+                            className={`flex items-start justify-start cursor-pointer text-[var(--text-color1)] hover:text-[var(--primary-color)] 
+              ${memoizedFunction(item.level)}`}
+                          >
+                            <div className=" mr-2">-</div>
+                            <div>{item.text}</div>
+                          </div>
+                        );
+                      }),
+                    },
+                  ]}
+                />
+              </div>
               <img
                 className="w-full object-cover mt-1 rounded-lg"
                 src={`${blogInfo.blog.imgUrl}`}
@@ -331,7 +368,7 @@ export const BlogDetailView: React.FC = () => {
             }}
           />
         </div>
-        <div className="w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
+        <div className="hidden md:block w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
           {
             <div className="p-4 w-full max-h-[800px] overflow-auto">
               <div className="text-[var(--main-color)] font-bold text-xl">

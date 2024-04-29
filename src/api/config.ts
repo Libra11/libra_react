@@ -12,7 +12,7 @@ const dev_service = {
   FILE: `${file_url}`,
 };
 
-const exam_prod_url: string = "http://207.246.104.44:9090/";
+const exam_prod_url: string = "http://penlibra.com:9090/";
 const prod_server = {
   EXAM: `${exam_prod_url}`,
   FILE: `${file_url}`,

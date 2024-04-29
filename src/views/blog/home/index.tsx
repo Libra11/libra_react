@@ -26,8 +26,8 @@ export const BlogHomeView: React.FC = () => {
       }}
     >
       <div className="flex-1 h-full flex items-center justify-center">
-        <div className="w-[450px] flex-col items-start justify-center">
-          <div className="animate__animated animate__backInLeft text-[3.5rem] leading-[4.5rem] font-bold text-[var(--main-color)]">
+        <div className="w-full px-4 -mt-5 md:mt-0 md:px-0 md:w-[450px] flex-col items-start justify-center">
+          <div className="animate__animated animate__backInLeft text-[2rem] md:text-[3.5rem] leading-[4.5rem] font-bold text-[var(--main-color)]">
             Keep moving forward.
           </div>
           <div className="animate__animated animate__backInLeft animate__delay mt-8 text-[1.3rem] text-[var(--text-color1)]">
@@ -51,8 +51,10 @@ export const BlogHomeView: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex-1 h-full flex items-center justify-center animate__animated animate__fadeIn">
-        <SvgIcon name={isDark ? "bg_dark" : "bg"} size="70%" />
+      <div className="flex-1 h-full hidden md:block animate__animated animate__fadeIn">
+        <div className="h-full flex items-center justify-center ">
+          <SvgIcon name={isDark ? "bg_dark" : "bg"} size="70%" />
+        </div>
       </div>
     </div>
   );

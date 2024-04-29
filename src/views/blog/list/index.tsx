@@ -1,5 +1,6 @@
 import { blogInfo, getBlogsApi } from "@/api/blog";
 import { BlogItem } from "@/components/BlogItem";
+import { BlogItemMobile } from "@/components/BlogItemMobile";
 import SvgIcon from "@/components/Svg";
 import { TagCom } from "@/components/Tag";
 import { formatTimestamp } from "@/utils";
@@ -67,64 +68,76 @@ export const BlogRecentView: React.FC = () => {
 
   return (
     dataSource.length > 0 && (
-      <div className="w-[1280px] m-auto flex justify-center items-start">
-        <div className=" w-[940px] pl-5 pr-10">
-          <div
-            className="animate__animated animate__backInDown transition-all w-full h-[250px] rounded-[20px] border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden"
-            onClick={() => goDetail(dataSource[0].id)}
-          >
-            <img
-              className=" h-full w-[280px] object-cover"
-              src={`${dataSource[0].imgUrl}`}
-              alt=""
-            />
-            <div className="pl-5 pr-20 py-5 flex-1 flex flex-col items-start justify-center">
-              <div className="">
-                {dataSource[0].category.map((item: any) => (
-                  <TagCom key={item.id} tag={item} />
-                ))}
-              </div>
-              <div className=" text-2xl font-bold mt-2 text-[var(--main-color)] overflow-ellipsis line-clamp-2">
-                {dataSource[0].title}
-              </div>
-              <div className=" text-sm mt-4 text-[var(--text-color1)] overflow-hidden overflow-ellipsis line-clamp-2">
-                {dataSource[0].desc}
-              </div>
-              <div className="mt-4 flex items-center justify-between w-full text-[var(--text-color1)]">
-                <div className="flex items-center justify-center">
-                  <SvgIcon
-                    name="time"
-                    size={24}
-                    color="text-[var(--text-color1)]"
-                  />
-                  <div className="ml-1">
-                    {formatTimestamp(dataSource[0].createAt)}
-                  </div>
+      <div className="w-full md:w-[1280px] h-full m-auto flex justify-center items-start pb-8">
+        <div className="w-[940px] md:pl-5 md:pr-10 h-full overflow-auto">
+          <div className="hidden md:block">
+            <div
+              className="animate__animated animate__backInDown transition-all w-full h-[250px] rounded-[20px] border border-[var(--card-border)] flex items-center justify-center cursor-pointer overflow-hidden"
+              onClick={() => goDetail(dataSource[0].id)}
+            >
+              <img
+                className=" h-full w-[280px] object-cover"
+                src={`${dataSource[0].imgUrl}`}
+                alt=""
+              />
+              <div className="pl-5 pr-20 py-5 flex-1 flex flex-col items-start justify-center">
+                <div className="">
+                  {dataSource[0].category.map((item: any) => (
+                    <TagCom key={item.id} tag={item} />
+                  ))}
                 </div>
-                <div className="flex items-center justify-center">
-                  <SvgIcon
-                    name="update"
-                    size={24}
-                    color="text-[var(--text-color1)]"
-                  />
-                  <div className="ml-1">
-                    {formatTimestamp(dataSource[0].updateAt)}
+                <div className=" text-2xl font-bold mt-2 text-[var(--main-color)] overflow-ellipsis line-clamp-2">
+                  {dataSource[0].title}
+                </div>
+                <div className=" text-sm mt-4 text-[var(--text-color1)] overflow-hidden overflow-ellipsis line-clamp-2">
+                  {dataSource[0].desc}
+                </div>
+                <div className="mt-4 flex items-center justify-between w-full text-[var(--text-color1)]">
+                  <div className="flex items-center justify-center">
+                    <SvgIcon
+                      name="time"
+                      size={24}
+                      color="text-[var(--text-color1)]"
+                    />
+                    <div className="ml-1">
+                      {formatTimestamp(dataSource[0].createAt)}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <SvgIcon
+                      name="update"
+                      size={24}
+                      color="text-[var(--text-color1)]"
+                    />
+                    <div className="ml-1">
+                      {formatTimestamp(dataSource[0].updateAt)}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-12 text-2xl font-bold text-[var(--main-color)]">
+
+          <div className="md:mt-12 ml-2 md:ml-0 text-2xl font-bold text-[var(--main-color)]">
             Recently
           </div>
-          <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
-            {dataSource.map((blog, idx) => (
-              <BlogItem key={idx} blog={blog} />
-            ))}
+          <div className="hidden md:block">
+            <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
+              {dataSource.map((blog, idx) => (
+                <BlogItem key={idx} blog={blog} />
+              ))}
+            </div>
+          </div>
+          <div className="md:hidden">
+            <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
+              {dataSource.map((blog, idx) => (
+                <BlogItemMobile key={idx} blog={blog} />
+              ))}
+            </div>
           </div>
           <Pagination className="mt-4 text-right" {...paginationProps} />
         </div>
-        <div className="animate__animated animate__backInRight mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] cursor-pointer relative border border-[var(--card-border)]">
+        <div className="hidden md:block animate__animated animate__backInRight mt-14 w-[280px] h-[260px] bg-[var(--bg-color)] rounded-[20px] cursor-pointer relative border border-[var(--card-border)]">
           <img
             className="absolute w-[100px] h-[100px] -top-[50px] left-[90px] border-2 border-[var(--primary-color)] rounded-full"
             src={avatar}

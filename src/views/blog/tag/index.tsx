@@ -6,6 +6,7 @@
  */
 import { blogInfo, getAllTagsApi, getBlogsApi } from "@/api/blog";
 import { BlogItem } from "@/components/BlogItem";
+import { BlogItemMobile } from "@/components/BlogItemMobile";
 import { TagCom } from "@/components/Tag";
 import { Pagination } from "antd";
 import { useEffect, useState } from "react";
@@ -82,29 +83,54 @@ export const BlogTagView: React.FC = () => {
     getTag();
   }, []);
   return (
-    <div className=" w-[1280px] m-auto flex items-start justify-start">
+    <div className="w-full md:w-[1280px] m-auto flex items-start justify-start">
       <div className=" flex-1">
-        <div className="text-[var(--main-color)] text-[2rem] font-bold mt-8">
+        <div className="md:hidden p-2">
+          <div className=" w-full border border-[var(--card-border)] rounded-[10px] hover:shadow-lg font-bold sticky top-[120px] left-2 p-4 flex justify-start items-start flex-wrap">
+            {tag.map((item) => (
+              <div
+                className="cursor-pointer flex mb-1"
+                onClick={getTagById(item.id)}
+                key={item.id}
+              >
+                <TagCom key={item.id} tag={item} />
+                <div className=" w-1"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="ml-2 md:ml-0 text-[var(--main-color)] text-[2rem] font-bold mt-8">
           Result
         </div>
-        <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
-          {dataSource.map((blog, idx) => (
-            <BlogItem key={idx} blog={blog} />
-          ))}
+        <div className="hidden md:block">
+          <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
+            {dataSource.map((blog, idx) => (
+              <BlogItem key={idx} blog={blog} />
+            ))}
+          </div>
+        </div>
+        <div className="md:hidden">
+          <div className="mt-4 flex-1 flex flex-wrap items-center justify-start">
+            {dataSource.map((blog, idx) => (
+              <BlogItemMobile key={idx} blog={blog} />
+            ))}
+          </div>
         </div>
         <Pagination className="mt-4 text-right" {...paginationProps} />
       </div>
-      <div className=" w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg font-bold sticky top-[120px] left-2 ml-8 p-4 flex justify-start items-start flex-wrap">
-        {tag.map((item) => (
-          <div
-            className="cursor-pointer flex mb-1"
-            onClick={getTagById(item.id)}
-            key={item.id}
-          >
-            <TagCom key={item.id} tag={item} />
-            <div className=" w-1"></div>
-          </div>
-        ))}
+      <div className="hidden md:block">
+        <div className=" w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg font-bold sticky top-[120px] left-2 ml-8 p-4 flex justify-start items-start flex-wrap">
+          {tag.map((item) => (
+            <div
+              className="cursor-pointer flex mb-1"
+              onClick={getTagById(item.id)}
+              key={item.id}
+            >
+              <TagCom key={item.id} tag={item} />
+              <div className=" w-1"></div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
