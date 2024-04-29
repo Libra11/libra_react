@@ -18,7 +18,7 @@ const SvgIcon = (props: SvgIconProps) => {
   const symbolId = useMemo(() => `#${prefix}-${name}`, [prefix, name]);
   return (
     <svg aria-hidden="true" width={size} height={size} fill={color}>
-      <use href={symbolId} fill={color} />
+      <use href={symbolId} fill={color} color={color} />
     </svg>
   );
 };

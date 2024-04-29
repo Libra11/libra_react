@@ -73,6 +73,7 @@ export const BlogDetailView: React.FC = () => {
 
     // 在文章上添加鼠标悬停事件监听器
     article.addEventListener("click", async (event: any) => {
+      if (event.target.matches("svg")) return;
       // 检查鼠标悬停的元素是否是自定义标签
       if (event.target.className === "word") {
         const styleStr = checkMousePosition(event);
@@ -102,6 +103,7 @@ export const BlogDetailView: React.FC = () => {
     });
 
     article.addEventListener("click", function (event: any) {
+      if (event.target.matches("svg")) return;
       // 检查鼠标移开的元素是否是自定义标签
       if (event.target.className !== "word") {
         popup.style.cssText = "";
@@ -135,23 +137,6 @@ export const BlogDetailView: React.FC = () => {
     }
     setAnchor(treeJson);
   };
-
-  // const getMarkdownAnchor2 = (markdown: string) => {
-  //   const reg = /(#+)\s+(.*)/g;
-  //   const treeJson: any = [];
-  //   let result = null;
-  //   while ((result = reg.exec(markdown)) !== null) {
-  //     const level = result[1].length;
-  //     const text = result[2];
-  //     const item = {
-  //       text,
-  //       level,
-  //     };
-  //     treeJson.push(item);
-  //   }
-  //   console.log(treeJson);
-  //   setAnchor(treeJson);
-  // };
 
   const memoizedFunction = (function () {
     const cache: any = {};
@@ -349,16 +334,32 @@ export const BlogDetailView: React.FC = () => {
                 const { children, className, ...rest } = props;
                 const match = /language-(\w+)/.exec(className || "");
                 return match ? (
-                  <SyntaxHighlighter
-                    {...rest}
-                    PreTag="div"
-                    children={String(children).replace(/\n$/, "")}
-                    language={match[1]}
-                    style={atomDark}
-                    showLineNumbers={true}
-                    wrapLines={true}
-                    ref={null}
-                  />
+                  <div className="relative">
+                    <div
+                      className="absolute top-2 right-2 cursor-pointer hover:opacity-70 z-[999]"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          String(children).replace(/\n$/, "")
+                        );
+                      }}
+                    >
+                      <SvgIcon
+                        name="copy"
+                        size={28}
+                        color="var(--primary-color)"
+                      />
+                    </div>
+                    <SyntaxHighlighter
+                      {...rest}
+                      PreTag="div"
+                      children={String(children).replace(/\n$/, "")}
+                      language={match[1]}
+                      style={atomDark}
+                      showLineNumbers={true}
+                      wrapLines={true}
+                      ref={null}
+                    />
+                  </div>
                 ) : (
                   <code {...rest} className={className}>
                     {children}
