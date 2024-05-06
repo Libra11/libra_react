@@ -15,7 +15,7 @@ export const BlogLayout: React.FC = () => {
       <div
         className="font-['montserrat']"
         style={{
-          height: "calc(100vh - 100px)",
+          height: "calc(100vh - 128px)",
         }}
       >
         <Outlet />

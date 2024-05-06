@@ -63,9 +63,13 @@ export const HeaderCom: React.FC = () => {
   const goToBlogDetail = (id: number) => {
     navigate(`/blog/detail/${id}`);
   };
+
+  const goHome = () => {
+    navigate("/blog/home");
+  };
   return (
-    <div className="sticky top-0 left-0 flex justify-between items-center h-[100px] bg-[var(--bg-color)] px-4 md:px-8">
-      <div className=" flex items-center justify-center">
+    <div className="sticky top-0 left-0 flex justify-between items-center h-[100px] bg-[var(--bg-color)] px-4 md:px-8 z-10">
+      <div className=" flex items-center justify-center" onClick={goHome}>
         <SvgIcon name={isDark ? "logo_dark" : "logo"} size={24} />
         <span className=" ml-1 text-[var(--main-color)] text-xl font-bold">
           Libra

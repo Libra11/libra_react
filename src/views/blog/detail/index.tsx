@@ -168,7 +168,7 @@ export const BlogDetailView: React.FC = () => {
     initBlogField();
   }, []);
   return (
-    <div className="blog-content w-full overflow-auto   h-full">
+    <div className="blog-content w-full h-full">
       <div
         id="popup"
         style={{ display: "none", position: "fixed" }}
@@ -242,15 +242,15 @@ export const BlogDetailView: React.FC = () => {
       <div className="w-full md:w-[1280px] m-auto h-full  flex items-start justify-center">
         <div
           id="article"
-          className="px-2 md:px-0 leading-8 w-full md:w-[968px] text-[var(--text-color1)]"
+          className="px-2 md:pl-0 leading-8 w-full md:w-[968px] overflow-auto h-full text-[var(--text-color1)] md:pr-4"
         >
           {blogInfo ? (
             <div>
-              <div className=" text-4xl font-bold mt-2 text-[var(--main-color)] overflow-ellipsis line-clamp-2">
+              <div className="animate__animated animate__backInDown text-4xl font-bold mt-2 text-[var(--main-color)] overflow-ellipsis line-clamp-2">
                 {blogInfo.blog.title}
               </div>
               <div className="flex justify-between items-center my-2">
-                <div className="flex">
+                <div className="animate__animated animate__backInLeft flex">
                   {blogInfo.blog.category.map((item: any) => (
                     <div className="flex" key={item.id}>
                       <TagCom key={item.id} tag={item} />
@@ -258,7 +258,7 @@ export const BlogDetailView: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="flex">
+                <div className="animate__animated animate__backInRight flex">
                   {blogInfo.blog.tags.map((item: any) => (
                     <div className="flex" key={item.id}>
                       <TagCom key={item.id} tag={item} />
@@ -268,7 +268,7 @@ export const BlogDetailView: React.FC = () => {
                 </div>
               </div>
               <div className="mt-1 flex items-center justify-between w-full text-[var(--text-color1)] text-xs">
-                <div className="flex items-center justify-center">
+                <div className="animate__animated animate__backInLeft flex items-center justify-center">
                   <SvgIcon
                     name="time"
                     size={18}
@@ -278,7 +278,7 @@ export const BlogDetailView: React.FC = () => {
                     {formatTimestamp(blogInfo.blog.createAt)}
                   </div>
                 </div>
-                <div className="flex items-center justify-center">
+                <div className="animate__animated animate__backInRight flex items-center justify-center">
                   <SvgIcon
                     name="update"
                     size={18}
@@ -289,7 +289,7 @@ export const BlogDetailView: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="md:hidden my-2">
+              <div className="animate__animated animate__zoomIn md:hidden my-2">
                 <Collapse
                   items={[
                     {
@@ -334,9 +334,9 @@ export const BlogDetailView: React.FC = () => {
                 const { children, className, ...rest } = props;
                 const match = /language-(\w+)/.exec(className || "");
                 return match ? (
-                  <div className="relative">
+                  <div className="relative bg-[#1d1f21] rounded-lg pt-3">
                     <div
-                      className="absolute top-2 right-2 cursor-pointer hover:opacity-70 z-[999]"
+                      className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
                       onClick={() => {
                         navigator.clipboard.writeText(
                           String(children).replace(/\n$/, "")
@@ -369,7 +369,7 @@ export const BlogDetailView: React.FC = () => {
             }}
           />
         </div>
-        <div className="hidden md:block w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] left-2 ml-8">
+        <div className="animate__animated animate__backInRight hidden md:block w-[280px] border border-[var(--card-border)] rounded-[20px] hover:shadow-lg leading-8 font-bold sticky top-[120px] ml-4 left-2">
           {
             <div className="p-4 w-full max-h-[800px] overflow-auto">
               <div className="text-[var(--main-color)] font-bold text-xl">

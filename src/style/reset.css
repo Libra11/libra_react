@@ -347,7 +347,7 @@ video {
 }
 ::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #fff;
+  background-color: var(--bg-color);
 }
 ::-webkit-scrollbar {
   width: 2px;
