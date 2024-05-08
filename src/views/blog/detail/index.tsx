@@ -338,9 +338,22 @@ export const BlogDetailView: React.FC = () => {
                     <div
                       className="absolute top-2 right-2 cursor-pointer hover:opacity-70"
                       onClick={() => {
-                        navigator.clipboard.writeText(
-                          String(children).replace(/\n$/, "")
-                        );
+                        const textarea = document.createElement("textarea");
+                        document.body.appendChild(textarea);
+                        // 隐藏此输入框
+                        textarea.style.position = "absolute";
+                        textarea.style.clip = "rect(0 0 0 0)";
+                        // 赋值
+                        textarea.value = String(children).replace(/\n$/, "");
+                        // 选中
+                        textarea.select();
+                        // 复制
+                        document.execCommand("copy", true);
+                        // 删除
+                        document.body.removeChild(textarea);
+                        // navigator.clipboard.writeText(
+                        //   String(children).replace(/\n$/, "")
+                        // );
                       }}
                     >
                       <SvgIcon
